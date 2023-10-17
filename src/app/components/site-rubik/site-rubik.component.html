@@ -1,0 +1,103 @@
+<div left>
+  <div moves>
+    <!-- button (click)="clickMove(c)" *ngFor="let c of moveButtons" mat-icon-button>{{c}}</button -->
+    <button (click)="btnView()" mat-icon-button>
+      <mat-icon>{{icons.view[view] ?? 'question_mark'}}</mat-icon>
+    </button>
+    <button (click)="rs.reset()" mat-icon-button>
+      <mat-icon>undo</mat-icon>
+    </button>
+    <button (click)="btnMode()" mat-icon-button>
+      <mat-icon>{{icons.mode[mode]}}</mat-icon>
+    </button>
+    <button (click)="btnExplode()" mat-icon-button>
+      <mat-icon>{{icons.explode[explode]}}</mat-icon>
+    </button>
+    <button (click)="btnMix()" mat-icon-button>
+      <mat-icon>blender</mat-icon>
+    </button>
+    <!-- button (click)="btnImage()" mat-icon-button>
+      <mat-icon>image</mat-icon>
+    </button -->
+    <button (click)="btnHideUnchanged()" mat-icon-button>
+      <mat-icon>masks</mat-icon>
+    </button>
+    <button (click)="btnRecord()" mat-icon-button>
+      <mat-icon>{{doRecord ? 'stop' : 'fiber_manual_record'}}</mat-icon>
+    </button>
+    <button (click)="btnClearRecord()" [disabled]="Utils.isEmpty(globals.siteConfig.rubikRecorded)" mat-icon-button>
+      <mat-icon>delete</mat-icon>
+    </button>
+  </div>
+  <div (mousedown)="mouseDown($event)"
+       (mousemove)="mouseMove($event)"
+       (mouseup)="mouseUp($event)"
+       class="cube">
+    <div [style]="styleForRoot" id="cube">
+      <ng-container *ngIf="view === 'flat'">
+        <div [class]="view" [style]="styleForCube" cube>
+          <div *ngFor="let face of 'dbrlfu'.split('')" class="face {{face}}">
+            <div class="plates">
+              <ng-container *ngFor="let y of [0,1,2]">
+                <div *ngFor="let x of [0,1,2]"
+                     [class]="mode"
+                     [innerHTML]="textForPlate(face, x, y)"
+                     [style]="styleForPlate(face, x,y)"
+                     cell>
+                </div>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+      <div *ngIf="view === 'three-d'" [class]="[view, mode]" [style]="styleForCube" cube>
+        <ng-container *ngFor="let layer of rs.cube.layers, index as l">
+          <ng-container *ngFor="let cubicle of layer.cubicles, index as c">
+            <!-- div style="{{keyframeForCubicle(l,c)}}"></div -->
+            <div
+              (@doturn.done)="turnFaceId !== '_' ? applyTurn() : '_'"
+              [@doturn]="turnFaceId !== '_' ?turnCubicle(l, c): '_'"
+              [style]="styleForCubicle(l, c)"
+              cubicle>
+              <div (click)="clickFace(face, l, c)"
+                   *ngFor="let face of 'udfblr'.split('')"
+                   [class]="classForFace(face, l, c)"
+                   face>
+                <div [class]="mode"
+                     [innerHTML]="textForCubicle(face, l, c)"
+                     [style]="styleForFace(face, cubicle, l, c)"
+                     plate>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+        </ng-container>
+        <!--
+              <div *ngFor="let c of l.cubicles" cubicle>
+                {{c | json}}
+              </div>
+        -->
+      </div>
+    </div>
+  </div>
+  <img [src]="srcImage" alt="cube image" hideMissingImage image/>
+</div>
+<div style="display:flex;flex-flow:column;max-width:200px">
+  <ng-container *ngIf="mode==='debug'">
+    <div>{{rotx}} {{roty}} {{rotz}}</div>
+    <div>{{_mouseDown | json}}</div>
+  </ng-container>
+</div>
+<div right>
+  <app-rubik-move (onMove)="doSequence($event)" [move]="globals.siteConfig.rubikRecorded" name="Recorded"></app-rubik-move>
+  <app-rubik-move (onMove)="doSequence($event)" move="uuRRFFUbbdlFlFlFDbbU" name="Cube in Cube"></app-rubik-move>
+  <app-rubik-move (onMove)="doSequence($event)" move="ulufRRbRFUbbUbLuFURf" name="Cube in Cube in Cube"></app-rubik-move>
+  <app-rubik-move (onMove)="doSequence($event)" move="ulULUFuf" name="Spiegel - 2. Ebene"></app-rubik-move>
+  <app-rubik-move (onMove)="doSequence($event)" move="UFRUruf" name="Spiegel - 3. Ebene - Kantentausch"></app-rubik-move>
+  <app-rubik-move (onMove)="doSequence($event)" move="RERERERE" name="Spiegel - 3. Ebene - Kantendrehen"></app-rubik-move>
+  <app-rubik-move (onMove)="doSequence($event)" move="ulURuLUr" name="Spiegel - 3. Ebene - Eckentausch"></app-rubik-move>
+  <app-rubik-move (onMove)="doSequence($event)" move="RfrFRfrF" name="Spiegel - 3 Ebene - Eckendrehen"></app-rubik-move>
+  <app-rubik-move (onMove)="doSequence($event)" move="RUrurFRRuruRUrf" name="Blind Edgeswap"></app-rubik-move>
+  <app-rubik-move (onMove)="doSequence($event)" move="RuruRURDruRdrUUru" name="Blind Parity"></app-rubik-move>
+  <app-rubik-move (onMove)="doSequence($event)" move="RuruRUrfRUrurFR" name="Blind Cornerswap"></app-rubik-move>
+</div>

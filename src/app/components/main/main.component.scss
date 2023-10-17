@@ -1,0 +1,87 @@
+:host {
+  display: flex;
+  position: relative;
+  overflow: hidden;
+}
+
+[btn-site].current {
+  background: rgba(255, 255, 0, 0.4);
+}
+
+[mainpanel].trashing {
+  background: var(--toolbarBack);
+}
+
+[mainpanel] {
+  display: flex;
+  flex-flow: column;
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--mainBack);
+  color: var(--mainFore);
+  overflow: hidden;
+
+  [toolbar] {
+    display: flex;
+    flex-flow: row;
+    justify-content: space-between;
+    background-color: var(--toolbarBack);
+    color: var(--toolbarFore);
+    z-index: 2;
+    position: relative;
+    padding: 0 0.5em;
+
+    div {
+      display: flex;
+      flex-flow: row;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      max-width: 50%;
+    }
+
+    div:nth-child(2) {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      height: 100%;
+    }
+
+    mat-icon {
+      color: var(--toolbarFore);
+    }
+
+    mat-icon#link-delete {
+      color: var(--trashcan);
+    }
+  }
+
+  [content].grid {
+    overflow-y: auto;
+  }
+}
+
+::ng-deep [linkcard] {
+  background: var(--linkBack) !important;
+  color: var(--linkFore) !important;
+}
+
+.appicon {
+  width: 32px;
+}
+
+::ng-deep .mat-mdc-menu-panel {
+  background-color: var(--menuBack);
+  color: var(--menuFore);
+}
+
+.btnLanguage:not(:hover) {
+  .crowdin {
+    display: none;
+  }
+}
+
+.crowdin {
+  margin-top: 12px;
+  position: fixed;
+}

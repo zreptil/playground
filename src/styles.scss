@@ -1,0 +1,391 @@
+@import 'google-fonts.css';
+@import 'assets/themes/standard/index.css';
+
+::-webkit-scrollbar {
+  width: 16px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+::-webkit-scrollbar-track {
+  background-color: rgba(0, 0, 0, 0);
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  --doc-height: 100vh;
+  display: flex;
+  flex-flow: column;
+  overflow: hidden;
+  width: 100vw;
+  height: var(--doc-height);
+  margin: 0;
+  padding: 0;
+  align-items: center;
+  justify-content: center;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+
+  --mdc-theme-primary: blue;
+
+  --logInfoBack: #606099;
+  --logInfoFore: #fff;
+  --logWarnBack: #ff8020;
+  --logWarnFore: #fff;
+  --logErrorBack: #ff2020;
+  --logErrorFore: #fff;
+  --logTodoBack: #4040ff;
+  --logTodoFore: #c0c0ff;
+  --logTodoBorder: rgba(255, 255, 255, 0.7);
+  --logDebugColor: 255, 255, 0;
+  --logDebugBack: repeating-linear-gradient(45deg, rgba(var(--logDebugColor), 0.6), rgba(var(--logDebugColor), 0.6) 10px, rgba(var(--logDebugColor), 0.8) 10px, rgba(var(--logDebugColor), 0.8) 20px);
+  --logDebugFore: #000;
+  --helpBack: #fff;
+  --helpFore: #000;
+  --markBorder: 1px solid #000;
+
+  --toolbarBack: rgba(0, 0, 0, 0.4);
+  --toolbarFore: rgba(255, 255, 255, 0.9);
+  --mainBack: #c3c;
+  --mainFore: black;
+  --trashcan: rgba(255, 255, 255, 0.3);
+
+  --linkBack: rgba(255, 255, 255, 0.4);
+  --linkFore: black;
+
+  --confirmBack: #66f;
+  --confirmFore: black;
+
+  --editLinkBack: #88f;
+  --editLinkFore: black;
+
+  --impressumBack: orange;
+  --impressumFore: black;
+
+  --menuBack: var(--mainBack);
+  --menuFore: var(--mainFore);
+
+  --settingsHeaderBack: #ff0;
+  --settingsHeaderFore: #f0f;
+  --settingsBodyBack: #f00;
+  --settingsBodyFore: #00f;
+
+  --debugFirst: #220;
+  --debugSecond: #550;
+  --debugFore: #f4b400;
+  --legalHeaderBack: #e65100;
+  --legalHeaderFore: #ffe0b2;
+  --legalBodyBack: #ffb74d;
+  --legalBodyFore: black;
+  --legalScrollThumb: #f57c00;
+  --legalLink: #e65100;
+  --whatsnewHeaderBack: #1c3aa9;
+  --whatsnewHeaderFore: #c6dafc;
+  --whatsnewBodyBack: #4285f4;
+  --whatsnewBodyFore: black;
+  --whatsnewScrollThumb: #3367d6;
+  --whatsnewLink: rgba(255, 255, 255, 0.6);
+  --localFore: #9c27b0;
+  --localBack: #e1bee7;
+  --betaFore: #097138;
+  --betaBack: transparent;
+  --pdfBtnBack: #e06055;
+  --pdfBtnFore: #ffffffcc;
+  --pdfInfoFore: #000000b2;
+  --sendMarked: #0277bd;
+  --googleSignedout: #e06055;
+  --loopMarked: rgba(255, 255, 255, 0.4);
+  --outputparamsHeaderBack: #a52714;
+  --outputparamsHeaderFore: #f4c7c3;
+  --outputparamsBodyBack: #e67c73;
+  --outputparamsBodyFore: black;
+  --printparamsScrollThumb: #c53929;
+  --shortcutHeaderBack: #01579b;
+  --shortcutHeaderFore: #b3e5fc;
+  --shortcutBodyBack: #4fc3f7;
+  --shortcutBodyFore: black;
+  --shortcutScrollThumb: #0288d1;
+  --helpHeaderBack: #33691e;
+  --helpHeaderFore: #dcedc8;
+  --helpBodyBack: #aed581;
+  --helpBodyFore: black;
+  --helpScrollThumb: #689f38;
+  --infoHeaderBack: #a52714;
+  --infoHeaderFore: #f4c7c3;
+  --infoBodyBack: #e67c73;
+  --infoBodyFore: black;
+  --infoWarningColor: #f6bf26;
+  --infoErrorColor: #e06055;
+  --infoInfoColor: #5e97f6;
+  --infoScrollThumb: #c53929;
+  --glucLow: #ff6666;
+  --glucNormLow: #809933;
+  --glucNorm: #00cc00;
+  --glucNormHigh: #aacc00;
+  --glucHigh: #cccc00;
+  --datepickerBtnEmptyBack: #e67c73;
+  --datepickerBtnEmptyFore: black;
+  --datepickerHeaderEmptyBack: #db4437;
+  --datepickerHeaderEmptyFore: white;
+  --datepickerHeaderBack: #006064;
+  --datepickerHeaderFore: white;
+  --datepickerBodyBack: #00bcd4;
+  --datepickerMonthTitleBack: #006064;
+  --datepickerMonthTitleFore: white;
+  --datepickerMonthBack: #00bcd4;
+  --datepickerMonthFore: black;
+  --datepickerBtnRaisedBack: #0097a7;
+  --datepickerBtnRaisedFore: black;
+  --datepickerBtnRaisedKeyBack: #0b8043;
+  --datepickerBtnRaisedKeyFore: white;
+  --datepickerBtnShiftKeyBack: rgba(255, 255, 255, 0.4);
+  --datepickerBtnShiftKeyFore: black;
+  --datepickerDowActiveBack: #006064;
+  --datepickerDowActiveFore: #aed581;
+  --datepickerDowInactiveBack: #db4437;
+  --datepickerDowInactiveFore: #eda29b;
+  --sendCountFore: black;
+  --sendCountFrame: white;
+
+  --mainHeaderBack: var(--toolbarBack);
+  --mainHeaderFore: var(--toolbarFore);
+  --mainBodyBack: inherit;
+  --mainBodyFore: inherit;
+}
+
+mat-icon[small] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1em;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.is-local {
+  color: var(--localFore) !important;
+  background-color: var(--localBack) !important;
+}
+
+.dialog-box {
+  max-height: 90vh;
+  min-width: 50vw;
+  max-width: 90vw !important;
+
+  .cdk-drag {
+    display: flex;
+    flex-flow: column;
+    max-width: 90vw;
+    overflow-x: hidden;
+  }
+
+  .mat-mdc-dialog-container {
+    display: flex;
+
+    > :nth-child(1) {
+      display: flex;
+      flex-flow: column;
+      flex: 1;
+    }
+
+    padding: 0;
+
+    .mat-mdc-dialog-title {
+      cursor: move;
+      padding: 0.6em;
+      display: flex;
+      flex-flow: row;
+      align-items: center;
+      justify-content: space-between;
+      margin: 0;
+
+      h1 {
+        display: flex;
+        gap: 0.5em;
+        align-items: center;
+        margin: 0;
+        font-size: 1.4em;
+        font-weight: normal;
+      }
+    }
+
+    .mat-mdc-dialog-content {
+      display: flex;
+      flex-flow: column;
+      padding: 1em;
+      margin: 0;
+      font-size: 1.2em;
+      min-width: 50%;
+    }
+
+    .mat-mdc-dialog-actions {
+      margin: 0;
+      padding: 0;
+      min-height: 3em;
+      justify-content: space-between;
+
+      .mat-button-wrapper {
+        display: flex;
+        flex-flow: row;
+        align-items: center;
+        justify-content: center;
+        gap: 1em;
+      }
+    }
+  }
+}
+
+* {
+  font-family: Roboto, Helvetica, Arial, sans-serif;
+}
+
+.loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+}
+
+.cover {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 76px;
+  margin-left: -38px;
+  height: 64px;
+}
+
+.mat-raised-button {
+  background-color: var(--toolbarBack);
+  color: var(--toolbarFore);
+}
+
+.mat-button, .mat-fab, .mat-mini-fab {
+  background-color: transparent;
+}
+
+.imageButton {
+  img {
+    height: 16px;
+  }
+}
+
+.mat-button, .mat-raised-button, .mat-icon-button, .mat-stroked-button, .mat-flat-button, .mat-fab, .mat-mini-fab {
+  font-weight: normal;
+}
+
+.debug {
+  background: var(--logDebugBack);
+  color: var(--logDebugFore) !important;
+
+  mat-icon {
+    color: var(--logDebugFore) !important;
+  }
+}
+
+form.oauth2 {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+
+  input {
+    width: 50em;
+    border: none;
+    background: var(--toolbarBack);
+    color: var(--toolbarFore);
+    border-radius: 0.5em;
+  }
+}
+
+.dialog-box {
+  .cdk-drag {
+    overflow-y: hidden;
+  }
+
+  .mat-mdc-dialog-container {
+    width: 100%;
+
+    .mdc-dialog__surface {
+      display: flex;
+      width: 100%;
+      height: 100%;
+    }
+
+    .mat-mdc-dialog-title {
+      background-color: rgba(0, 0, 0, 0.2);
+    }
+
+    .mat-mdc-dialog-actions {
+      .mat-mdc-button {
+        --mdc-text-button-label-text-color: var(--mainHeaderFore);
+      }
+    }
+  }
+}
+
+.dialog-box.confirm {
+  .mat-mdc-dialog-container {
+    --mdc-dialog-container-color: var(--confirmBack);
+    --mdc-dialog-subhead-color: var(--confirmFore);
+    --mdc-dialog-supporting-text-color: var(--confirmFore);
+  }
+}
+
+.dialog-box.edit-link {
+  .mat-mdc-dialog-container {
+    --mdc-dialog-container-color: var(--editLinkBack);
+    --mdc-dialog-subhead-color: var(--editLinkFore);
+    --mdc-dialog-supporting-text-color: var(--editLinkFore);
+  }
+
+  .mat-mdc-dialog-actions {
+    .mat-mdc-button {
+      --mdc-text-button-label-text-color: var(--editLinkFore);
+    }
+  }
+}
+
+.dialog-box.welcome {
+  .mat-mdc-dialog-container {
+    --mdc-dialog-container-color: var(--editLinkBack);
+    --mdc-dialog-subhead-color: var(--editLinkFore);
+    --mdc-dialog-supporting-text-color: var(--editLinkFore);
+  }
+}
+
+.dialog-box.impressum {
+  .mat-mdc-dialog-container {
+    --mdc-dialog-container-color: var(--impressumBack);
+    --mdc-dialog-subhead-color: var(--impressumFore);
+    --mdc-dialog-supporting-text-color: var(--impressumFore);
+  }
+}
+
+.dialog-box.whatsnew {
+  .mat-mdc-dialog-container {
+    --mdc-dialog-container-color: var(--editLinkBack);
+    --mdc-dialog-subhead-color: var(--editLinkFore);
+    --mdc-dialog-supporting-text-color: var(--editLinkFore);
+  }
+}
+
+img[alt=favicon] {
+  max-height: 24px;
+}
+
+html {
+  overflow: hidden !important;
+}
