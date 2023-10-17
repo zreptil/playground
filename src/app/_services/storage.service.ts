@@ -1,15 +1,15 @@
 import {Injectable} from '@angular/core';
 import {Log, LogService} from '@/_services/log.service';
 import {Utils} from '@/classes/utils';
-import {GLOBALS} from '@/_services/globals.service';
+import {GLOBALS, GlobalsService} from '@/_services/globals.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class StorageService {
 
-  constructor() {
-    LogService.create(localStorage.getItem(GLOBALS.debugFlag) === GLOBALS.debugActive,
+  constructor(globals: GlobalsService) {
+    LogService.create(localStorage.getItem(globals.debugFlag) === globals.debugActive,
       localStorage.getItem('iamdev') === 'true',
       true);
   }

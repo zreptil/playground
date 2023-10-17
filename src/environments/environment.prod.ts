@@ -3,5 +3,5 @@ export const environment = {
   // name of settings file in google appdatafolder
   settingsFilename: 'playground-settings',
   // api key for dropbox
-  DROPBOX_APP_KEY: 'z5opkgt8251mhsb'
+  DROPBOX_APP_KEY: 'z8sm9sp5t03ffej'
 };
