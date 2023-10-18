@@ -56,7 +56,7 @@
             <!-- div style="{{keyframeForCubicle(l,c)}}"></div -->
             <div
               (@doturn.done)="turnFaceId !== '_' ? applyTurn() : '_'"
-              [@doturn]="turnFaceId !== '_' ?turnCubicle(l, c): '_'"
+              [@doturn]="turnFaceId !== '_' ? turnCubicle(l, c) : '_'"
               [style]="styleForCubicle(l, c)"
               cubicle>
               <div (click)="clickFace(face, l, c)"

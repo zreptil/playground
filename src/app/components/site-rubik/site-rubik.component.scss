@@ -168,6 +168,10 @@
     }
 
     [face]:hover {
+      ::ng-deep .blind {
+        display: none;
+      }
+
       ::ng-deep .cfm {
         display: inherit;
       }

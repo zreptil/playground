@@ -267,9 +267,6 @@ export class SiteRubikComponent {
         break;
       case 'colorize':
         break;
-      case 'blind':
-        ret.push(this.rs.cube.blindName(faceId, l, c));
-        break;
       default:
         const def = this.movementFor(faceId, l, c);
         if (def != null) {
@@ -316,6 +313,19 @@ export class SiteRubikComponent {
     };
   }
 
+  // @HostListener('document:keypress', ['$event'])
+  // keypress(evt: KeyboardEvent) {
+  //   switch (this.mode) {
+  //     case 'colorize':
+  //       if (+evt.key >= 1 && +evt.key <= 9) {
+  //         this.rs.toggleHidden(this.currFace, +evt.key - 1);
+  //         break;
+  //       } else if ('ulfrbd'.indexOf(evt.key) >= 0) {
+  //         this.currFace = evt.key;
+  //       }
+  //   }
+  // }
+
   mouseMove(evt: MouseEvent) {
     if (this.view !== 'three-d') {
       return;
@@ -346,19 +356,6 @@ export class SiteRubikComponent {
     }
   }
 
-  // @HostListener('document:keypress', ['$event'])
-  // keypress(evt: KeyboardEvent) {
-  //   switch (this.mode) {
-  //     case 'colorize':
-  //       if (+evt.key >= 1 && +evt.key <= 9) {
-  //         this.rs.toggleHidden(this.currFace, +evt.key - 1);
-  //         break;
-  //       } else if ('ulfrbd'.indexOf(evt.key) >= 0) {
-  //         this.currFace = evt.key;
-  //       }
-  //   }
-  // }
-
   mouseUp(_evt: MouseEvent) {
     if (this.view !== 'three-d') {
       return;
@@ -371,6 +368,50 @@ export class SiteRubikComponent {
     this.keysDown.alt = evt.altKey;
     this.keysDown.shift = evt.shiftKey;
     this.keysDown.ctrl = evt.ctrlKey;
+
+    if (evt.key >= 'a' && evt.key <= 'x') {
+      this.execEdgeSwap(evt.key);
+    } else if (evt.key >= 'A' && evt.key <= 'X') {
+      this.execCornerSwap(evt.key.toLowerCase());
+    }
+  }
+
+  execEdgeSwap(c: string): void {
+    let moves = this.getBlindAdjust(c, this.rs.cube.blindEdgeAdjust);
+    if (moves != null) {
+      moves += 'RUrurFRRuruRUrf' + this.getBlindAdjust(Utils.toggleCase(c), this.rs.cube.blindEdgeAdjust);
+      this.doSequence(moves, 0.1, true);
+    }
+  }
+
+  execCornerSwap(c: string): void {
+    let moves = this.getBlindAdjust(c, this.rs.cube.blindCornerAdjust);
+    if (moves != null) {
+      moves += 'RuruRUrfRUrurFR' + this.getBlindAdjust(Utils.toggleCase(c), this.rs.cube.blindCornerAdjust);
+      this.doSequence(moves, 0.1, true);
+    }
+  }
+
+  getBlindAdjust(c: string, list: any): string {
+    if (c != null) {
+      let revert = false;
+      if (c >= 'A' && c <= 'X') {
+        revert = true;
+      }
+      let moves = list[c.toLowerCase()];
+      if (moves != null) {
+        if (revert) {
+          moves = Utils.toggleCase(moves);
+          const temp = [];
+          for (let i = moves.length - 1; i >= 0; i--) {
+            temp.push(moves[i]);
+          }
+          moves = Utils.join(temp, '');
+        }
+        return moves;
+      }
+    }
+    return null;
   }
 
   @HostListener('document:keyup', ['$event'])

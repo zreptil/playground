@@ -196,6 +196,59 @@ export class RubikCube {
     5: {b: 'yellow', f: 'rgba(0,0,0,0.8)'},
     6: {b: 'rgb(255,128,0)', f: 'rgba(0,0,0,0.8)'},
   }
+  blindEdgeAdjust: any = {
+    a: 'MMdLL',
+    b: '',
+    c: 'MMDLL',
+    d: '',
+    e: 'LeL',
+    f: 'eL',
+    g: 'leL',
+    h: 'El',
+    i: 'MdLL',
+    j: 'eeL',
+    k: 'Flf',
+    l: 'l',
+    m: '',
+    n: 'EL',
+    o: 'dFlf',
+    p: 'el',
+    q: 'mDLL',
+    r: 'L',
+    s: 'mdLL',
+    t: 'EEl',
+    u: 'dLL',
+    v: 'DDLL',
+    w: 'DLL',
+    x: 'LL'
+  };
+
+  blindCornerAdjust: any = {
+    a: '',
+    b: 'RR',
+    c: 'FFD',
+    d: 'FF',
+    e: '',
+    f: 'fD',
+    g: 'f',
+    h: 'dR',
+    i: 'Fr',
+    j: 'r',
+    k: 'fr',
+    l: 'FFr',
+    m: 'F',
+    n: 'rF',
+    o: 'RRF',
+    p: 'RF',
+    q: 'Rd',
+    r: '',
+    s: 'Df',
+    t: 'R',
+    u: 'D',
+    v: '',
+    w: 'd',
+    x: 'DD'
+  };
 
   constructor() {
   }
