@@ -160,7 +160,17 @@
     }
   }
 
-  [cube].three-d:not(.colorize) {
+  [cube].three-d.blind {
+    [face]:hover {
+      opacity: 0.2;
+
+      [plate] {
+        background-color: lime !important;
+      }
+    }
+  }
+
+  [cube].three-d:not(.colorize, .blind) {
     ::ng-deep .cfm {
       display: none;
       color: white;
@@ -168,10 +178,6 @@
     }
 
     [face]:hover {
-      ::ng-deep .blind {
-        display: none;
-      }
-
       ::ng-deep .cfm {
         display: inherit;
       }

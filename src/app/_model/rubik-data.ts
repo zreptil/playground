@@ -198,7 +198,7 @@ export class RubikCube {
   }
   blindEdgeAdjust: any = {
     a: 'MMdLL',
-    b: '',
+    b: null,
     c: 'MMDLL',
     d: '',
     e: 'LeL',
@@ -209,7 +209,7 @@ export class RubikCube {
     j: 'eeL',
     k: 'Flf',
     l: 'l',
-    m: '',
+    m: null,
     n: 'EL',
     o: 'dFlf',
     p: 'el',
@@ -224,11 +224,11 @@ export class RubikCube {
   };
 
   blindCornerAdjust: any = {
-    a: '',
+    a: null,
     b: 'RR',
     c: 'FFD',
     d: 'FF',
-    e: '',
+    e: null,
     f: 'fD',
     g: 'f',
     h: 'dR',
@@ -241,7 +241,7 @@ export class RubikCube {
     o: 'RRF',
     p: 'RF',
     q: 'Rd',
-    r: '',
+    r: null,
     s: 'Df',
     t: 'R',
     u: 'D',
@@ -444,6 +444,11 @@ export class RubikCube {
       if (pos >= 0) {
         const letter = pos + 'ulfrbd'.indexOf(faceId) * 4;
         ret = String.fromCharCode(letter + 65);
+        if (idx % 2 !== 0 && ret === 'B') {
+          ret = '#';
+        } else if (idx % 2 === 0 && ret === 'E') {
+          ret = '#';
+        }
       }
     }
     return ret;

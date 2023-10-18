@@ -230,6 +230,15 @@ export class SiteRubikComponent {
       case 'colorize':
         this.rs.toggleHidden(faceId, l * 9 + c);
         break;
+      case 'blind':
+        const face = this.rs.cube.face(faceId);
+        const idx = face.findIndex(f => f.l === l && f.c === c);
+        if (idx % 2 === 0) {
+          this.execCornerSwap(this.rs.cube.blindName(faceId, l, c).toLowerCase());
+        } else {
+          this.execEdgeSwap(this.rs.cube.blindName(faceId, l, c).toLowerCase());
+        }
+        break;
       default:
         const def = this.movementFor(faceId, l, c);
         if (def != null) {
@@ -266,6 +275,9 @@ export class SiteRubikComponent {
         ret.push(`${faceId}${l * 9 + c}`); //idx ?? '??');
         break;
       case 'colorize':
+        break;
+      case 'blind':
+        ret.push(`<div class="blind">${this.rs.cube.blindName(faceId, l, c)}</div>`);
         break;
       default:
         const def = this.movementFor(faceId, l, c);
@@ -368,12 +380,6 @@ export class SiteRubikComponent {
     this.keysDown.alt = evt.altKey;
     this.keysDown.shift = evt.shiftKey;
     this.keysDown.ctrl = evt.ctrlKey;
-
-    if (evt.key >= 'a' && evt.key <= 'x') {
-      this.execEdgeSwap(evt.key);
-    } else if (evt.key >= 'A' && evt.key <= 'X') {
-      this.execCornerSwap(evt.key.toLowerCase());
-    }
   }
 
   execEdgeSwap(c: string): void {
