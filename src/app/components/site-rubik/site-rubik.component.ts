@@ -385,7 +385,7 @@ export class SiteRubikComponent {
   execEdgeSwap(c: string): void {
     let moves = this.getBlindAdjust(c, this.rs.cube.blindEdgeAdjust);
     if (moves != null) {
-      moves += 'RUrurFRRuruRUrf' + this.getBlindAdjust(Utils.toggleCase(c), this.rs.cube.blindEdgeAdjust);
+      moves += 'RUrurFrruruRUrf' + this.getBlindAdjust(Utils.toggleCase(c), this.rs.cube.blindEdgeAdjust);
       this.doSequence(moves, 0.1, true);
     }
   }
