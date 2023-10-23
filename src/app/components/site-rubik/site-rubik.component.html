@@ -28,6 +28,12 @@
     <button (click)="btnClearRecord()" [disabled]="Utils.isEmpty(globals.siteConfig.rubikRecorded)" mat-icon-button>
       <mat-icon>delete</mat-icon>
     </button>
+    <div speed>
+      <div label>{{turnSpeed}} s</div>
+      <mat-slider [discrete]="true" max="5" min="0.1" step="0.1">
+        <input [(ngModel)]="turnSpeed" matSliderThumb>
+      </mat-slider>
+    </div>
   </div>
   <div (mousedown)="mouseDown($event)"
        (mousemove)="mouseMove($event)"
@@ -61,22 +67,17 @@
               cubicle>
               <div (click)="clickFace(face, l, c)"
                    *ngFor="let face of 'udfblr'.split('')"
-                   [class]="classForFace(face, l, c)"
+                   [class]="this.classForFace(face, l, c)"
                    face>
                 <div [class]="mode"
-                     [innerHTML]="textForCubicle(face, l, c)"
-                     [style]="styleForFace(face, cubicle, l, c)"
+                     [innerHTML]="this.textForCubicle(face, l, c)"
+                     [style]="this.styleForFace(face, cubicle, l, c)"
                      plate>
                 </div>
               </div>
             </div>
           </ng-container>
         </ng-container>
-        <!--
-              <div *ngFor="let c of l.cubicles" cubicle>
-                {{c | json}}
-              </div>
-        -->
       </div>
     </div>
   </div>

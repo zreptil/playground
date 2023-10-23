@@ -52,6 +52,7 @@ export class GlobalsService {
     rubikRotx: -30,
     rubikRoty: 30,
     rubikRotz: 0,
+    rubikTurnSpeed: 0.2,
     rubikRecorded: ''
   }
   private flags = '';

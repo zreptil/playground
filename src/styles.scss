@@ -19,6 +19,7 @@ html, body {
 
 body {
   --doc-height: 100vh;
+  --content-height: calc(var(--doc-height) - 48px);
   display: flex;
   flex-flow: column;
   overflow: hidden;

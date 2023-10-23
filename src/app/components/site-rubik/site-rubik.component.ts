@@ -15,7 +15,7 @@ import {RubikCube, RubikCubicle} from '@/_model/rubik-data';
   animations: [
     trigger('doturn', [
         transition('_ => *', [
-            animate('{{speed}}s', keyframes([
+            animate(`{{speed}}s`, keyframes([
               style({transform: `{{from}}`}),
               style({transform: `{{to}}`})
             ]))
@@ -25,6 +25,7 @@ import {RubikCube, RubikCubicle} from '@/_model/rubik-data';
     )
   ]
 })
+
 // https://stackoverflow.com/questions/68191999/angular-animations-how-to-set-transition-timing-dynamically
 export class SiteRubikComponent {
   icons: any = {
@@ -45,9 +46,7 @@ export class SiteRubikComponent {
   _mouseDown: any = null;
   cubicleSize = 50;
   explode = 'no';
-  turnFaceId: string = '_';
   turnSequence = '';
-  turnSpeed = 0.2;
   // http://test.reptilefarm.ddns.net/rubik/
   srcImage: string;
   keysDown = {
@@ -57,11 +56,21 @@ export class SiteRubikComponent {
   };
   doRecord = false;
   sequenceRunning = false;
+  turnFaceId: string = '_';
   protected readonly Utils = Utils;
 
   constructor(public rs: RubikService,
               public ms: MessageService,
               public globals: GlobalsService) {
+  }
+
+  get turnSpeed(): number {
+    return GLOBALS.siteConfig.rubikTurnSpeed;
+  }
+
+  set turnSpeed(value: number) {
+    GLOBALS.siteConfig.rubikTurnSpeed = value;
+    GLOBALS.saveSharedData();
   }
 
   get view(): string {
@@ -226,6 +235,9 @@ export class SiteRubikComponent {
   }
 
   clickFace(faceId: string, l: number, c: number) {
+    if (this.turnFaceId !== '_') {
+      return;
+    }
     switch (this.mode) {
       case 'colorize':
         this.rs.toggleHidden(faceId, l * 9 + c);
@@ -277,7 +289,12 @@ export class SiteRubikComponent {
       case 'colorize':
         break;
       case 'blind':
-        ret.push(`<div class="blind">${this.rs.cube.blindName(faceId, l, c)}</div>`);
+        const n = this.rs.cube.blindName(faceId, l, c);
+        if (n.length === 1) {
+          ret.push(`<div class="blind">${n}</div>`);
+        } else {
+          ret.push(`<span class="material-icons blind">${n}</span>`);
+        }
         break;
       default:
         const def = this.movementFor(faceId, l, c);
@@ -324,19 +341,6 @@ export class SiteRubikComponent {
       rotz: this.rotz
     };
   }
-
-  // @HostListener('document:keypress', ['$event'])
-  // keypress(evt: KeyboardEvent) {
-  //   switch (this.mode) {
-  //     case 'colorize':
-  //       if (+evt.key >= 1 && +evt.key <= 9) {
-  //         this.rs.toggleHidden(this.currFace, +evt.key - 1);
-  //         break;
-  //       } else if ('ulfrbd'.indexOf(evt.key) >= 0) {
-  //         this.currFace = evt.key;
-  //       }
-  //   }
-  // }
 
   mouseMove(evt: MouseEvent) {
     if (this.view !== 'three-d') {
@@ -581,13 +585,12 @@ export class SiteRubikComponent {
         }
       };
     }
-    return null;
+    return {value: null, params: {speed: this.turnSpeed}};
   }
 
   applyTurn() {
     this.rs.cube.move(this.turnFaceId);
     this.turnFaceId = '_';
-    this.turnSpeed = 0.2;
     if (this.turnSequence.length > 0) {
       setTimeout(() => this.doSequence(this.turnSequence, this.turnSpeed, false), 10);
     } else {
@@ -622,7 +625,6 @@ export class SiteRubikComponent {
     this.sequenceRunning = true;
     switch (this.view) {
       case 'three-d':
-        this.turnSpeed = speed;
         this.turnSequence = moves.substring(1);
         this.turnFaceId = moves.substring(0, 1);
         break;

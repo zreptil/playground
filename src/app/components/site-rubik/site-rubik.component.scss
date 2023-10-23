@@ -1,7 +1,7 @@
 :host {
   display: flex;
   flex-flow: row;
-  height: var(--doc-height);
+  height: var(--content-height);
 }
 
 [left] {
@@ -296,4 +296,30 @@
 [image] {
   width: 200px;
   border: 1px solid black;
+}
+
+[speed] {
+  display: flex;
+  flex-flow: row;
+  align-items: center;
+
+  [label] {
+    margin: 1em;
+    width: 3em;
+    display: flex;
+    justify-content: flex-end;
+  }
+}
+
+.mat-mdc-slider.mat-primary {
+  --mdc-slider-handle-color: var(--mainFore);
+  --mdc-slider-focus-handle-color: var(--mainFore);
+  --mdc-slider-hover-handle-color: var(--mainFore);
+  --mdc-slider-active-track-color: var(--mainFore);
+  --mdc-slider-inactive-track-color: var(--mainFore);
+  --mdc-slider-with-tick-marks-active-container-color: #fff;
+  --mdc-slider-with-tick-marks-inactive-container-color: var(--mainFore);
+  --mat-mdc-slider-ripple-color: var(--mainFore);
+  --mat-mdc-slider-hover-ripple-color: rgba(63, 81, 181, 0.05);
+  --mat-mdc-slider-focus-ripple-color: rgba(63, 81, 181, 0.2);
 }

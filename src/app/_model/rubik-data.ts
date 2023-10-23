@@ -445,9 +445,9 @@ export class RubikCube {
         const letter = pos + 'ulfrbd'.indexOf(faceId) * 4;
         ret = String.fromCharCode(letter + 65);
         if (idx % 2 !== 0 && ret === 'B') {
-          ret = '#';
+          ret = 'ads_click';
         } else if (idx % 2 === 0 && ret === 'E') {
-          ret = '#';
+          ret = 'ads_click';
         }
       }
     }
