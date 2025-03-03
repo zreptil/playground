@@ -1,0 +1,53 @@
+<div>
+  <div>Collatz-Problem</div>
+  <ol>
+    <li>Nimm eine natürliche Zahl n</li>
+    <li>Wenn sie gerade ist: n/2</li>
+    <li>Wenn sie ungerade ist: 3n+1</li>
+    <li>fahre mit dieser Zahl bei 2 fort, wenn die Zahl nicht 1 ist</li>
+    <li>Die Folge endet immer in der Schleife 1-4-2-1</li>
+    <li>Problem: Ist das so? Beweise es!</li>
+    <li>Erkenntnisse:
+      <ol>
+        <li>
+          Wenn die betrachtete Zahl eine 2er Potenz ist,
+          dann führt das immer zu 1-4-2-1
+        </li>
+        <li>
+          Eine 2er Potenz mit einem ungeraden Exponenten kann nicht durch 3n+1 erreicht werden.
+        </li>
+        <li>
+          Starke Annahme: JEDE 2er Potenz mit einem geraden Exponenten kann durch 3n+1 erreicht werden.
+        </li>
+        <li>Zwei Beweismöglichkeiten, wenn die starke Annahme stimmt:
+          <ol>
+            <li>
+              Beweis, dass es eine Zahl gibt, die niemals eine 2er Potenz mit einem geraden Exponenten erreicht =&gt; Collatz liegt falsch
+            </li>
+            <li>
+              Beweis, dass JEDE Zahl ZWANGSLÄUFIG bei einer 2er Potenz mit einem geraden Exponenten landet =&gt; Collatz liegt richtig
+            </li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+  </ol>
+</div>
+<form (ngSubmit)="calculate()" [formGroup]="form">
+  <mat-form-field appearance="fill">
+    <mat-label>Natürliche Zahl</mat-label>
+    <input formControlName="num" matInput min="1" required type="number">
+    <mat-error *ngIf="form.get('num').hasError('required')">
+      Zahl ist erforderlich.
+    </mat-error>
+    <mat-error *ngIf="form.get('num').hasError('min')">
+      Die Zahl muss positiv sein.
+    </mat-error>
+  </mat-form-field>
+  <button [disabled]="form.invalid" color="primary" mat-raised-button type="submit">
+    Berechnen
+  </button>
+  {{ twoExp }}
+  {{ num?.d3_1?.num }}
+
+</form>

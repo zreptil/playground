@@ -35,7 +35,7 @@
     </div>
     <div>
       <button (click)="clickDebug($event)" *ngIf="globals.mayDebug" class="debug" mat-icon-button>
-        <mat-icon>{{globals.isDebug ? 'pest_control' : 'bug_report'}}</mat-icon>
+        <mat-icon>{{ globals.isDebug ? 'pest_control' : 'bug_report' }}</mat-icon>
       </button>
       <button (click)="sync.toggleSyncDropbox()" id="sync" mat-icon-button>
         <ng-container *ngIf="!sync.hasSync">
@@ -47,10 +47,27 @@
       </button>
     </div>
   </div>
-  <div [class]="globals.appSite" [ngSwitch]="globals.appSite" content>
-    <app-site-thumbling *ngSwitchCase="'thumb'"></app-site-thumbling>
-    <app-site-prime-numbers *ngSwitchCase="'prime'"></app-site-prime-numbers>
-    <app-site-rubik *ngSwitchCase="'rubik'"></app-site-rubik>
+  <div [class]="globals.appSite" content>
+    @switch (globals.appSite) {
+      @case ('thumb') {
+        <app-site-thumbling></app-site-thumbling>
+      }
+      @case ('prime') {
+        <app-site-prime-numbers></app-site-prime-numbers>
+      }
+      @case ('rubik') {
+        <app-site-rubik></app-site-rubik>
+      }
+      @case ('pdf') {
+        <app-site-pdf></app-site-pdf>
+      }
+      @case ('collatz') {
+        <app-site-collatz></app-site-collatz>
+      }
+      @case ('puzzlendar') {
+        <app-site-puzzlendar></app-site-puzzlendar>
+      }
+    }
   </div>
 </div>
 <app-progress></app-progress>

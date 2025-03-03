@@ -40,15 +40,19 @@ export class ColorUtils {
   }
 
   static rgb2string(rgb: number[]): string {
-    return Utils.pad(rgb[0].toString(16)) + Utils.pad(rgb[1].toString(16)) + Utils.pad(rgb[2].toString(16));
+    const ret: string[] = [];
+    for (const value of rgb) {
+      ret.push(Utils.pad(value?.toString(16)));
+    }
+    return Utils.join(ret, '');
   }
 
   static hsl2rgb(hsl: number[]): number[] {
     // arguments: [H,S,L] or H,S,L
     //return [r, g, b];
-    const h = Number(hsl[0]) / 360;
-    const s = Number(hsl[1]) / 100;
-    const l = Number(hsl[2]) / 100;
+    const h = +hsl[0] / 360;
+    const s = +hsl[1] / 100;
+    const l = +hsl[2] / 100;
     let r, g, b;
 
     if (s === 0) {
@@ -89,18 +93,9 @@ export class ColorUtils {
     const r = +rgb[0];
     const g = +rgb[1];
     const b = +rgb[2];
-    let hexR = r.toString(16);
-    if (hexR.length === 1) {
-      hexR = `0${hexR}`;
-    }
-    let hexG = g.toString(16);
-    if (hexG.length === 1) {
-      hexG = `0${hexG}`;
-    }
-    let hexB = b.toString(16);
-    if (hexB.length === 1) {
-      hexB = `0${hexB}`;
-    }
+    let hexR = Utils.pad(r.toString(16));
+    let hexG = Utils.pad(g.toString(16));
+    let hexB = Utils.pad(b.toString(16));
     return [hexR, hexG, hexB];
   }
 
@@ -197,8 +192,8 @@ export class ColorUtils {
     }
   }
 
-  static display_rgb(ry: number[]): string {
-    const rgb = `rgb(${Math.round(ry[0])},${Math.round(ry[1])},${Math.round(ry[2])})`;
+  static display_rgb(value: number[]): string {
+    const rgb = `rgb(${Math.round(value[0])},${Math.round(value[1])},${Math.round(value[2])})`;
     if (ColorUtils.validateRgb(rgb)) {
       return rgb;
     } else {
@@ -206,8 +201,12 @@ export class ColorUtils {
     }
   }
 
-  static display_hsl(ry: number[]): string | false {
-    const hsl = `hsl(${Math.round(ry[0])},${Math.round(ry[1])}%,${Math.round(ry[2])}%)`;
+  static display_rgba(value: number[], opacity: number): string {
+    return `rgba(${Math.round(value[0])},${Math.round(value[1])},${Math.round(value[2])},${opacity})`;
+  }
+
+  static display_hsl(value: number[]): string | false {
+    const hsl = `hsl(${Math.round(value[0])},${Math.round(value[1])}%,${Math.round(value[2])}%)`;
     if (ColorUtils.validateHsl(hsl)) {
       return hsl;
     } else {
@@ -229,6 +228,24 @@ export class ColorUtils {
     const ret = (l1 + .05) / (l2 + .05);
     // 0.05 for not dividing with 0
     return ret < 1 ? 1 / ret : ret;
+  }
+
+  static fontColor(rgbRy: number[]): string {
+    if (ColorUtils.colorContrast(rgbRy, [255, 255, 255]) > 4.5) {
+      return 'white';
+    } else {
+      return 'black';
+    }
+  }
+
+  static getLuminance(rgb: number[]) {
+    for (let i = 0; i < rgb.length; i++) {
+      const channel = rgb[i] / 255;
+      rgb[i] = channel <= 0.03928
+        ? channel / 12.92
+        : ((channel + 0.055) / 1.055) * 2.4;
+    }
+    return parseFloat((0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2]).toFixed(3));
   }
 
   static getFontColor(rgbRy: number[]): string {

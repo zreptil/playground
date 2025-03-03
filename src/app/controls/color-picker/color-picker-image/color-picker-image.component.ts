@@ -96,7 +96,7 @@ export class ColorPickerImageComponent extends ColorPickerBaseComponent implemen
         });
         reader.readAsDataURL(file);
       } else {
-        Log.error($localize`The file has ${file.size} Bytes, but may have a maximum of ${this.data.maxFilesize} Bytes.`);
+        Log.error($localize`Die Datei hat ${file.size} Bytes, darf aber maximal ${this.data.maxFilesize} Bytes haben.`);
         Log.debug(file);
       }
     } else {
@@ -106,13 +106,10 @@ export class ColorPickerImageComponent extends ColorPickerBaseComponent implemen
   }
 
   mousePos(event: MouseEvent): any {
-    const ret = {
-      x: event.clientX,
-      y: event.clientY
+    return {
+      x: event.offsetX,
+      y: event.offsetY
     };
-    ret.x -= this.canvas.offsetLeft;
-    ret.y -= this.canvas.offsetTop;
-    return ret;
   }
 
   getPixelAt(x: number, y: number): number[] {
@@ -128,9 +125,9 @@ export class ColorPickerImageComponent extends ColorPickerBaseComponent implemen
     return [R, G, B];
   }
 
-  clickCanvas(event: MouseEvent) {
-    const m = this.mousePos(event);
-    this.colorClick?.emit(new ColorData(this.getPixelAt(m.x, m.y)));
+  clickCanvas(_event: MouseEvent) {
+//    const m = this.mousePos(event);
+//    this.colorSaveClick?.emit(new ColorData(this.getPixelAt(m.x, m.y)));
   }
 
   wheelLens(event: WheelEvent) {

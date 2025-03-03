@@ -1,0 +1,24 @@
+<app-progress></app-progress>
+<div board>
+  <table [class]="classForState">
+    @for (row of ps.board; let y = $index; track y) {
+      <tr>
+        @for (cell of row; let x = $index; track x) {
+          <td (click)="clickCell($event, row, x)">
+            <div class="c{{cell}}">{{ content[y]?.[x] }}</div>
+          </td>
+        }
+      </tr>
+    }
+  </table>
+  @if (ps.boardString != null) {
+    <div solution>{{ ps.boardString?.toUpperCase() }}</div>
+  }
+</div>
+<button (click)="clickSolve($event, 'single')" [disabled]="!ps.isValid || ps.isWorking" mat-button>{{ msgSolve }}</button>
+@if (ps.solutionsFor(ps.boardDate) != null) {
+  <button (click)="clickTest($event, ps.boardDate)" [disabled]="!ps.isValid || ps.isWorking" mat-button>{{ msgSolution }}</button>
+}
+<button (click)="clickSolve($event, 'day')" [disabled]="!ps.isValid || ps.isWorking" mat-button>Tageslösungen ermitteln</button>
+<button (click)="clickSolve($event, 'all')" [disabled]="!ps.isValid || ps.isWorking" mat-button>Alle Lösungen ermitteln</button>
+<button (click)="clickClear($event)" [disabled]="!ps.isValid || ps.isWorking" mat-button>Lösungen für den Tag löschen</button>

@@ -152,8 +152,8 @@ body {
   --sendCountFore: black;
   --sendCountFrame: white;
 
-  --mainHeaderBack: var(--toolbarBack);
-  --mainHeaderFore: var(--toolbarFore);
+  --mainHeadBack: var(--toolbarBack);
+  --mainHeadFore: var(--toolbarFore);
   --mainBodyBack: inherit;
   --mainBodyFore: inherit;
 }
@@ -331,7 +331,7 @@ form.oauth2 {
 
     .mat-mdc-dialog-actions {
       .mat-mdc-button {
-        --mdc-text-button-label-text-color: var(--mainHeaderFore);
+        --mdc-text-button-label-text-color: var(--mainHeadFore);
       }
     }
   }

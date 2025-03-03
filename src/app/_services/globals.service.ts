@@ -12,6 +12,8 @@ import {MessageService} from '@/_services/message.service';
 import {DialogType} from '@/_model/dialog-data';
 import {WelcomeComponent} from '@/components/welcome/welcome.component';
 import {WhatsNewComponent} from '@/components/whats-new/whats-new.component';
+import {FormConfig} from '@/forms/form-config';
+import {DomSanitizer} from '@angular/platform-browser';
 
 class CustomTimeoutError extends Error {
   constructor() {
@@ -38,12 +40,21 @@ export class GlobalsService {
   theme: string;
   _syncType: oauth2SyncType;
   oauth2AccessToken: string = null;
+  listConfig: FormConfig[] = [];
+  listConfigOrg: FormConfig[] = [];
   sites = [
     {id: 'rubik'},
     {id: 'thumb'},
-    {id: 'prime'}
+    {id: 'prime'},
+    {id: 'pdf'},
+    {id: 'collatz'},
+    {id: 'puzzlendar'}
   ];
+  dragPos: any = {};
+  editColors = false;
   currentSite: string = 'rubik';
+  ownTheme: any;
+  isConfigured = true;
   siteConfig: any = {
     gridColumns: 4,
     showPrimeNumbers: false,
@@ -53,15 +64,19 @@ export class GlobalsService {
     rubikRoty: 30,
     rubikRotz: 0,
     rubikTurnSpeed: 0.2,
-    rubikRecorded: ''
+    rubikRecorded: '',
+    pdfTarget: '',
+    pdfData: null
   }
+  formListParams: any;
   private flags = '';
 
   constructor(public http: HttpClient,
               public sync: SyncService,
               public ls: LanguageService,
               public env: EnvironmentService,
-              public ms: MessageService) {
+              public ms: MessageService,
+              public sanitizer: DomSanitizer) {
     GLOBALS = this;
     this.loadWebData();
     this.loadSharedData().then(_ => {
@@ -179,11 +194,16 @@ export class GlobalsService {
   }
 
   saveSharedData(): void {
+    const formParams: { [key: string]: any } = {};
+    for (const cfg of this.listConfig) {
+      formParams[`${cfg.dataId}`] = cfg.asJson;
+    }
     const storage: any = {
       s0: Date.now(),
       s1: this.version,
       s2: this.appSite,
-      s3: this.siteConfig
+      s3: this.siteConfig,
+      s4: formParams
     };
     const data = JSON.stringify(storage);
     localStorage.setItem('sharedData', data);
@@ -204,6 +224,7 @@ export class GlobalsService {
     this._syncType = storage.w1 ?? oauth2SyncType.none;
     this.oauth2AccessToken = storage.w2;
     this.theme = storage.w3 ?? 'standard';
+    GLOBALS.ownTheme = storage.w4;
 
     // validate values
     if (this.oauth2AccessToken == null) {
@@ -216,7 +237,8 @@ export class GlobalsService {
       w0: this.language.code ?? 'de_DE',
       w1: this._syncType,
       w2: this.oauth2AccessToken,
-      w3: this.theme
+      w3: this.theme,
+      w4: GLOBALS.ownTheme
     };
     localStorage.setItem('webData', JSON.stringify(storage));
   }
@@ -264,6 +286,17 @@ export class GlobalsService {
     return params.asJson ? response.body : response;
   }
 
+  loadFormListParams(): void {
+    if (this.formListParams != null) {
+      for (const cfg of this.listConfig) {
+        cfg.fillFromString(this.formListParams[cfg.form.dataId] ?? {});
+      }
+      for (const cfg of this.listConfigOrg) {
+        cfg.fillFromString(this.formListParams[cfg.form.dataId] ?? {});
+      }
+    }
+  }
+
   private may(key: string): boolean {
     return this.flags.indexOf(`|${key}|`) >= 0;
   }
@@ -278,7 +311,7 @@ export class GlobalsService {
       }
       this.siteConfig = temp;
     }
-
+    this.formListParams = storage.s4;
     // validate values
   }
 }

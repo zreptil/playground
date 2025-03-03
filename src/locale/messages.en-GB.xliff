@@ -1,67 +1,56 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-  <file source-language="de" datatype="plaintext" original="ng2.template">
+  <file source-language="en" datatype="plaintext" original="ng2.template">
     <body>
       <trans-unit id="5037437391296624618" datatype="html">
         <source>Information</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_model/dialog-data.ts</context>
-          <context context-type="linenumber">58</context>
+          <context context-type="linenumber">59</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8720977247725652816" datatype="html">
         <source>Ok</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_model/dialog-data.ts</context>
-          <context context-type="linenumber">60</context>
+          <context context-type="linenumber">61</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_model/dialog-data.ts</context>
-          <context context-type="linenumber">68</context>
+          <context context-type="linenumber">69</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_model/dialog-data.ts</context>
-          <context context-type="linenumber">76</context>
+          <context context-type="linenumber">77</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1519954996184640001" datatype="html">
         <source>Error</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_model/dialog-data.ts</context>
-          <context context-type="linenumber">66</context>
+          <context context-type="linenumber">67</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6026586747124992284" datatype="html">
         <source>Debug Message</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_model/dialog-data.ts</context>
-          <context context-type="linenumber">74</context>
+          <context context-type="linenumber">75</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1234709746630139322" datatype="html">
         <source>Confirmation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_model/dialog-data.ts</context>
-          <context context-type="linenumber">82</context>
+          <context context-type="linenumber">83</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_model/dialog-data.ts</context>
-          <context context-type="linenumber">91</context>
+          <context context-type="linenumber">92</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3542042671420335679" datatype="html">
         <source>No</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/_model/dialog-data.ts</context>
-          <context context-type="linenumber">84</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/_model/dialog-data.ts</context>
-          <context context-type="linenumber">93</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="2807800733729323332" datatype="html">
-        <source>Yes</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_model/dialog-data.ts</context>
           <context context-type="linenumber">85</context>
@@ -71,15 +60,22 @@
           <context context-type="linenumber">94</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="2807800733729323332" datatype="html">
+        <source>Yes</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/_model/dialog-data.ts</context>
+          <context context-type="linenumber">86</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/_model/dialog-data.ts</context>
+          <context context-type="linenumber">95</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="8321702175940480370" datatype="html">
         <source>dd.MM.yyyy</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_model/lang-data.ts</context>
-          <context context-type="linenumber">28</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/classes/utils.ts</context>
-          <context context-type="linenumber">137</context>
+          <context context-type="linenumber">27</context>
         </context-group>
         <note priority="1" from="description">this is the dateformat, please use dd for days, MM for months and yyyy for year. It has to be the english formatstring.</note>
       </trans-unit>
@@ -87,153 +83,234 @@
         <source>dd.MM.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_model/lang-data.ts</context>
-          <context context-type="linenumber">32</context>
+          <context context-type="linenumber">31</context>
         </context-group>
         <note priority="1" from="description">this is the dateformat, please use dd for days, MM for months and no year. It has to be the english formatstring.</note>
+      </trans-unit>
+      <trans-unit id="3046182951092364902" datatype="html">
+        <source>The local data has another date than the date saved in Dropbox.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/_services/globals.service.ts</context>
+          <context context-type="linenumber">160</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2906587845957718064" datatype="html">
+        <source>Local</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/_services/globals.service.ts</context>
+          <context context-type="linenumber">161</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/_services/globals.service.ts</context>
+          <context context-type="linenumber">169</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="730703184011067892" datatype="html">
+        <source>Dropbox</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/_services/globals.service.ts</context>
+          <context context-type="linenumber">162</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/_services/globals.service.ts</context>
+          <context context-type="linenumber">170</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/_services/sync/sync.service.ts</context>
+          <context context-type="linenumber">69</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8046724290530937432" datatype="html">
+        <source>Use local data or data from Dropbox?</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/_services/globals.service.ts</context>
+          <context context-type="linenumber">163</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5320870651003627043" datatype="html">
+        <source>Question</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/_services/globals.service.ts</context>
+          <context context-type="linenumber">167</context>
+        </context-group>
       </trans-unit>
       <trans-unit id="6899006172769799970" datatype="html">
         <source>There was no answer within <x id="PH" equiv-text="params.timeout / 1000"/> seconds at <x id="PH_1" equiv-text="url"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_services/globals.service.ts</context>
-          <context context-type="linenumber">224</context>
+          <context context-type="linenumber">275</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3117299459475029064" datatype="html">
+        <source>Erzeuge PDF...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/_services/pdf.service.ts</context>
+          <context context-type="linenumber">42</context>
+        </context-group>
+        <note priority="1" from="description">text when pdf is being created</note>
+      </trans-unit>
+      <trans-unit id="5517254381877899996" datatype="html">
+        <source>Lade die Basisdaten...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/_services/pdf.service.ts</context>
+          <context context-type="linenumber">46</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1634398240503205507" datatype="html">
+        <source>Fehler beim Laden der Daten</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/_services/pdf.service.ts</context>
+          <context context-type="linenumber">50</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3402864355211188521" datatype="html">
+        <source>PDF anzeigen</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/_services/pdf.service.ts</context>
+          <context context-type="linenumber">54</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6530668891861059555" datatype="html">
+        <source>Fehler beim Laden der Daten:
+<x id="PH" equiv-text="error"/>
+<x id="PH_1" equiv-text="stacktrace"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/_services/pdf.service.ts</context>
+          <context context-type="linenumber">58</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1008046558562314154" datatype="html">
+        <source>Das PDF konnte nicht angezeigt werden. Ist ein Popup-Blocker aktiv?</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/_services/pdf.service.ts</context>
+          <context context-type="linenumber">421</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7351700212933699939" datatype="html">
         <source>The file <x id="PH" equiv-text="filename"/> was downloaded from Dropbox.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_services/sync/dropbox.service.ts</context>
-          <context context-type="linenumber">142</context>
+          <context context-type="linenumber">137</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1799878284198173341" datatype="html">
         <source>The file <x id="PH" equiv-text="filename"/> was not uploaded, since the content didn&apos;t change.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_services/sync/dropbox.service.ts</context>
-          <context context-type="linenumber">179</context>
+          <context context-type="linenumber">174</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2566917109822382269" datatype="html">
         <source>The file <x id="PH" equiv-text="filename"/> was uploaded to Dropbox.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_services/sync/dropbox.service.ts</context>
-          <context context-type="linenumber">184</context>
+          <context context-type="linenumber">179</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1232839296875773478" datatype="html">
         <source>Access to Dropbox could not be established again.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_services/sync/dropbox.service.ts</context>
-          <context context-type="linenumber">297</context>
+          <context context-type="linenumber">320</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="730703184011067892" datatype="html">
-        <source>Dropbox</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/_services/sync/sync.service.ts</context>
-          <context context-type="linenumber">50</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="5125540569203253391" datatype="html">
+      <trans-unit id="6968630760189801097" datatype="html">
         <source>The connection to <x id="PH" equiv-text="serviceName"/> requires a confirmation
-                      that <x id="PH_1" equiv-text="GLOBALS.appTitle"/> can read and write the data from
-                       <x id="PH_2" equiv-text="serviceName"/>. This confirmation is requested with special
-                        dialogs from <x id="PH_3" equiv-text="serviceName"/>. Everything that has to be
-                        confirmed there is beyond <x id="PH_4" equiv-text="GLOBALS.appTitle"/>&apos;s control.
-                         Should the confirmation process be started?</source>
+                     that <x id="PH_1" equiv-text="GLOBALS.appTitle"/> may read and write the data from
+                     <x id="PH_2" equiv-text="serviceName"/>. This confirmation is requested with special
+                     dialogs from <x id="PH_3" equiv-text="serviceName"/>. Everything that has to be
+                     confirmed there is beyond <x id="PH_4" equiv-text="GLOBALS.appTitle"/>&apos;s control.
+                     Should the confirmation process be started?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_services/sync/sync.service.ts</context>
-          <context context-type="linenumber">69,74</context>
+          <context context-type="linenumber">88,93</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8550844560794870731" datatype="html">
         <source>Do you want to unsync with Dropbox?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_services/sync/sync.service.ts</context>
-          <context context-type="linenumber">88</context>
+          <context context-type="linenumber">100</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3516494453193947151" datatype="html">
+        <source>Titel</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/_services/theme.service.ts</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2787611327745135703" datatype="html">
+        <source>Verarbeite mögliche Thumbs ...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/_services/thumbling.service.ts</context>
+          <context context-type="linenumber">39</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2345232055430072753" datatype="html">
+        <source>dd/MM/yyyy, hh:mm:ss</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/classes/utils.ts</context>
+          <context context-type="linenumber">4</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5592728170528035191" datatype="html">
         <source><x id="PH" equiv-text="hours"/>:<x id="PH_1" equiv-text="Utils.pad(-minutes % 60)"/> hours ago</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/classes/utils.ts</context>
-          <context context-type="linenumber">94</context>
+          <context context-type="linenumber">97</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3625099266824380912" datatype="html">
         <source>in <x id="PH" equiv-text="hours"/>:<x id="PH_1" equiv-text="Utils.pad(minutes % 60)"/> hours</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/classes/utils.ts</context>
-          <context context-type="linenumber">96</context>
+          <context context-type="linenumber">99</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8256466313580256940" datatype="html">
         <source><x id="PH" equiv-text="-minutes"/> min ago</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/classes/utils.ts</context>
-          <context context-type="linenumber">99</context>
+          <context context-type="linenumber">102</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2644027207588859009" datatype="html">
         <source>in <x id="PH" equiv-text="minutes"/> min</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/classes/utils.ts</context>
-          <context context-type="linenumber">99</context>
+          <context context-type="linenumber">102</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="3415838826182695013" datatype="html">
-        <source><x id="TAG_IMG" ctype="image" equiv-text="&lt;img alt=&quot;favicon&quot; src=&quot;{{data.favicon}}&quot;&gt;"/> Link </source>
+      <trans-unit id="671740983484503056" datatype="html">
+        <source>dd/MM/yyyy</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/config-link/config-link.component.html</context>
-          <context context-type="linenumber">5,7</context>
-        </context-group>
-        <note priority="1" from="description">title for configlink dialog</note>
-      </trans-unit>
-      <trans-unit id="8308045076391224954" datatype="html">
-        <source>Url</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/config-link/config-link.component.html</context>
-          <context context-type="linenumber">18</context>
+          <context context-type="sourcefile">src/app/classes/utils.ts</context>
+          <context context-type="linenumber">140</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="4077520913910941990" datatype="html">
-        <source>Label</source>
+      <trans-unit id="1547876271716599756" datatype="html">
+        <source>Impressum</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/config-link/config-link.component.html</context>
-          <context context-type="linenumber">22</context>
+          <context context-type="sourcefile">src/app/components/impressum/impressum.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+        <note priority="1" from="description">title of impressum</note>
+      </trans-unit>
+      <trans-unit id="8329935522579379235" datatype="html">
+        <source>Soll die Aufnahme gelöscht werden?</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/site-rubik/site-rubik.component.ts</context>
+          <context context-type="linenumber">683</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="314315645942131479" datatype="html">
-        <source>Info</source>
+      <trans-unit id="3492007542396725315" datatype="html">
+        <source>Welcome</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/config-link/config-link.component.html</context>
-          <context context-type="linenumber">27</context>
+          <context context-type="sourcefile">src/app/components/welcome/welcome.component.html</context>
+          <context context-type="linenumber">4</context>
         </context-group>
-      </trans-unit>
-      <trans-unit id="3768927257183755959" datatype="html">
-        <source>Save</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/config-link/config-link.component.html</context>
-          <context context-type="linenumber">37</context>
-        </context-group>
-        <note priority="1" from="description">buttonlabel for saving data</note>
-      </trans-unit>
-      <trans-unit id="5571821262318156307" datatype="html">
-        <source>never visited</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/link-card/link-card.component.html</context>
-          <context context-type="linenumber">12</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="3493323219410337551" datatype="html">
-        <source>Do you really want to delete this link?</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/link-card/link-card.component.ts</context>
-          <context context-type="linenumber">37</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/main/main.component.ts</context>
-          <context context-type="linenumber">66</context>
-        </context-group>
+        <note priority="1" from="description">title of welcome</note>
       </trans-unit>
       <trans-unit id="8245636934809197771" datatype="html">
         <source>Once upon a time...</source>
@@ -251,8 +328,8 @@
         </context-group>
         <note priority="1" from="description">version</note>
       </trans-unit>
-      <trans-unit id="8946691832586567504" datatype="html">
-        <source>1.0.0 - 23.03.2023</source>
+      <trans-unit id="8223682525752337069" datatype="html">
+        <source>1.0.0 - 23/03/2023</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/whats-new/whats-new.component.html</context>
           <context context-type="linenumber">13</context>
@@ -267,25 +344,404 @@
         </context-group>
         <note priority="1" from="description">v100a1</note>
       </trans-unit>
-      <trans-unit id="1218656448576107723" datatype="html">
-        <source>Colorselection</source>
+      <trans-unit id="2854123663314832793" datatype="html">
+        <source>Speichern</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/controls/color-picker/color-picker-dialog.html</context>
-          <context context-type="linenumber">5</context>
+          <context context-type="sourcefile">src/app/controls/color-cfg/color-cfg-dialog/color-cfg-dialog.component.html</context>
+          <context context-type="linenumber">31</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/controls/color-picker/color-picker-dialog/color-picker-dialog.html</context>
+          <context context-type="linenumber">75</context>
+        </context-group>
+        <note priority="1" from="description">buttonlabel for saving data</note>
+      </trans-unit>
+      <trans-unit id="6190510148494075296" datatype="html">
+        <source>Eule</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/controls/color-cfg/color-cfg-dialog/color-cfg-dialog.component.ts</context>
+          <context context-type="linenumber">30</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="6009512592400101890" datatype="html">
-        <source> With the button to the bottom right an image<x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br&gt;"/>can be loaded. From this you can<x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br&gt;"/>select a color. </source>
+      <trans-unit id="1885640229412236170" datatype="html">
+        <source>Datumsauswahl</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/controls/color-cfg/color-cfg-dialog/color-cfg-dialog.component.ts</context>
+          <context context-type="linenumber">31</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1097838746611379920" datatype="html">
+        <source>Glukosewerte</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/controls/color-cfg/color-cfg-dialog/color-cfg-dialog.component.ts</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3590805807378700861" datatype="html">
+        <source>Google</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/controls/color-cfg/color-cfg-dialog/color-cfg-dialog.component.ts</context>
+          <context context-type="linenumber">33</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="314315645942131479" datatype="html">
+        <source>Info</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/controls/color-cfg/color-cfg-dialog/color-cfg-dialog.component.ts</context>
+          <context context-type="linenumber">34</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forms/print-custom-form.ts</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7842597623910989718" datatype="html">
+        <source>Hilfe</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/controls/color-cfg/color-cfg-dialog/color-cfg-dialog.component.ts</context>
+          <context context-type="linenumber">35</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4361894835062853415" datatype="html">
+        <source>Gesetzliches</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/controls/color-cfg/color-cfg-dialog/color-cfg-dialog.component.ts</context>
+          <context context-type="linenumber">36</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3884532559361891104" datatype="html">
+        <source>Was bisher geschah...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/controls/color-cfg/color-cfg-dialog/color-cfg-dialog.component.ts</context>
+          <context context-type="linenumber">37</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8645499116170704011" datatype="html">
+        <source>Shortcut</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/controls/color-cfg/color-cfg-dialog/color-cfg-dialog.component.ts</context>
+          <context context-type="linenumber">38</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4435703504669117699" datatype="html">
+        <source>Einstellungen</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/controls/color-cfg/color-cfg-dialog/color-cfg-dialog.component.ts</context>
+          <context context-type="linenumber">39</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1980504865097627824" datatype="html">
+        <source>Log</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/controls/color-cfg/color-cfg-dialog/color-cfg-dialog.component.ts</context>
+          <context context-type="linenumber">40</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="847991382842753721" datatype="html">
+        <source>Lokal</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/controls/color-cfg/color-cfg-dialog/color-cfg-dialog.component.ts</context>
+          <context context-type="linenumber">41</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8289732336438690874" datatype="html">
+        <source>Beta</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/controls/color-cfg/color-cfg-dialog/color-cfg-dialog.component.ts</context>
+          <context context-type="linenumber">42</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3422890808980876594" datatype="html">
+        <source>Debug</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/controls/color-cfg/color-cfg-dialog/color-cfg-dialog.component.ts</context>
+          <context context-type="linenumber">43</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="238096398375218127" datatype="html">
+        <source>Ausgabe Parameter</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/controls/color-cfg/color-cfg-dialog/color-cfg-dialog.component.ts</context>
+          <context context-type="linenumber">44</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4406866608460672746" datatype="html">
+        <source>Hauptseite</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/controls/color-cfg/color-cfg-dialog/color-cfg-dialog.component.ts</context>
+          <context context-type="linenumber">45</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4586989554085646197" datatype="html">
+        <source>Benutzer</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/controls/color-cfg/color-cfg-dialog/color-cfg-dialog.component.ts</context>
+          <context context-type="linenumber">46</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8662740667717601091" datatype="html">
+        <source>Farbanpassungen</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/controls/color-cfg/color-cfg-dialog/color-cfg-dialog.component.ts</context>
+          <context context-type="linenumber">63</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7462553473091085055" datatype="html">
+        <source>Farben für </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/controls/color-cfg/color-cfg-dialog/color-cfg-dialog.component.ts</context>
+          <context context-type="linenumber">63</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6197275694947788737" datatype="html">
+        <source>Sollen die Farbänderungen verworfen werden?</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/controls/color-cfg/color-cfg-dialog/color-cfg-dialog.component.ts</context>
+          <context context-type="linenumber">81</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6162693758764653365" datatype="html">
+        <source>Text</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/controls/color-cfg/color-cfg-dialog/color-cfg-dialog.component.ts</context>
+          <context context-type="linenumber">134</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3705124882880440129" datatype="html">
+        <source>Daten</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/controls/color-cfg/color-cfg-dialog/color-cfg-dialog.component.ts</context>
+          <context context-type="linenumber">135</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2981219928115418649" datatype="html">
+        <source>Link</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/controls/color-cfg/color-cfg-dialog/color-cfg-dialog.component.ts</context>
+          <context context-type="linenumber">136</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3044904102686667171" datatype="html">
+        <source>Hintergrund</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/controls/color-cfg/color-cfg-dialog/color-cfg-dialog.component.ts</context>
+          <context context-type="linenumber">139</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/controls/color-cfg/color-cfg-dialog/color-cfg-dialog.component.ts</context>
+          <context context-type="linenumber">140</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4247539601634640700" datatype="html">
+        <source>Rahmen</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/controls/color-cfg/color-cfg-dialog/color-cfg-dialog.component.ts</context>
+          <context context-type="linenumber">141</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1034342214183348854" datatype="html">
+        <source>Farbauswahl</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/controls/color-picker/color-picker-dialog/color-picker-dialog.ts</context>
+          <context context-type="linenumber">136</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5625678343679985724" datatype="html">
+        <source> Mit dem Button rechts unten kann ein Bild<x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br&gt;"/>geladen werden. Aus diesem kann dann<x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br&gt;"/>eine Farbe entnommen werden. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/controls/color-picker/color-picker-image/color-picker-image.component.html</context>
           <context context-type="linenumber">3,5</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="8026176613641286090" datatype="html">
-        <source>The file has <x id="PH" equiv-text="file.size"/> Bytes, but may have a maximum of <x id="PH_1" equiv-text="this.data.maxFilesize"/> Bytes.</source>
+      <trans-unit id="1502678440868604199" datatype="html">
+        <source>Die Datei hat <x id="PH" equiv-text="file.size"/> Bytes, darf aber maximal <x id="PH_1" equiv-text="this.data.maxFilesize"/> Bytes haben.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/controls/color-picker/color-picker-image/color-picker-image.component.ts</context>
           <context context-type="linenumber">99</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6413617351871198124" datatype="html">
+        <source>Ausgabe</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forms/base-print.ts</context>
+          <context context-type="linenumber">148</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2738344853196123783" datatype="html">
+        <source>Grafik</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forms/base-print.ts</context>
+          <context context-type="linenumber">152</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="544006034280571514" datatype="html">
+        <source>Tabelle</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forms/base-print.ts</context>
+          <context context-type="linenumber">156</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2323440543726766760" datatype="html">
+        <source>Alles</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forms/base-print.ts</context>
+          <context context-type="linenumber">160</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5151636223616140512" datatype="html">
+        <source>Glukose Perzentil Diagramm</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forms/base-print.ts</context>
+          <context context-type="linenumber">164</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2711250160567783345" datatype="html">
+        <source>GPD</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forms/base-print.ts</context>
+          <context context-type="linenumber">168</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3881770102020259507" datatype="html">
+        <source>Stündliche Statistik</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forms/base-print.ts</context>
+          <context context-type="linenumber">172</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8203928250407677295" datatype="html">
+        <source>Tagesbasalrate verwenden</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forms/base-print.ts</context>
+          <context context-type="linenumber">176</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2353356285650606192" datatype="html">
+        <source>Grafiken pro Seite</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forms/base-print.ts</context>
+          <context context-type="linenumber">180</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4496863263131552292" datatype="html">
+        <source>Temporäre Overrides</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forms/base-print.ts</context>
+          <context context-type="linenumber">184</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="862810997454722107" datatype="html">
+        <source>Ausrichtung</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forms/base-print.ts</context>
+          <context context-type="linenumber">188</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4825886895103641575" datatype="html">
+        <source>Wechsel</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forms/base-print.ts</context>
+          <context context-type="linenumber">192</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4799738962969899274" datatype="html">
+        <source>Tag (08:00 - 17:59)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forms/base-print.ts</context>
+          <context context-type="linenumber">196</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8482316664535002400" datatype="html">
+        <source>Dämmerung (06:00 - 07:59, 18:00 - 20:59)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forms/base-print.ts</context>
+          <context context-type="linenumber">200</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2594762698141458563" datatype="html">
+        <source>Nacht (21:00 - 05:59)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forms/base-print.ts</context>
+          <context context-type="linenumber">204</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4076382777671752130" datatype="html">
+        <source>Es sind keine Daten für den Ausdruck vorhanden</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forms/base-print.ts</context>
+          <context context-type="linenumber">546</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5351445087918354569" datatype="html">
+        <source>Basal Insulin</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forms/base-print.ts</context>
+          <context context-type="linenumber">585</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2633729073167909034" datatype="html">
+        <source><x id="PH" equiv-text="time"/> Uhr</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forms/base-print.ts</context>
+          <context context-type="linenumber">589</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="194157074469443413" datatype="html">
+        <source><x id="PH" equiv-text="time"/> am</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forms/base-print.ts</context>
+          <context context-type="linenumber">593</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7975293901451211912" datatype="html">
+        <source><x id="PH" equiv-text="time"/> pm</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forms/base-print.ts</context>
+          <context context-type="linenumber">597</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="help-custom-form" datatype="html">
+        <source>Ein Formular
+  für die Ausgabe eines PDF aufgrund einer Datenstruktur.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forms/print-custom-form.ts</context>
+          <context context-type="linenumber">8,9</context>
+        </context-group>
+        <note priority="1" from="description">help for custom form</note>
+      </trans-unit>
+      <trans-unit id="8953033926734869941" datatype="html">
+        <source>Name</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forms/print-custom-form.ts</context>
+          <context context-type="linenumber">14</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4806388705936868173" datatype="html">
+        <source>Width in cm</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forms/print-custom-form.ts</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1772637165584418803" datatype="html">
+        <source>Height in cm</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forms/print-custom-form.ts</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="466843274366731001" datatype="html">
+        <source>Parameter für PrintTemplate</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forms/print-custom-form.ts</context>
+          <context context-type="linenumber">35</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6363966941686262914" datatype="html">
+        <source>Nur ein Test</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forms/print-custom-form.ts</context>
+          <context context-type="linenumber">39</context>
         </context-group>
       </trans-unit>
     </body>
