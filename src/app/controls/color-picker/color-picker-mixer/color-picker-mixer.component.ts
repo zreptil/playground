@@ -16,9 +16,10 @@ import {ColorUtils} from '@/controls/color-picker/color-utils';
 //https://github.com/google/material-design-icons/blob/master/variablefont/MaterialSymbolsSharp%5BFILL,GRAD,opsz,wght%5D.ttf?raw=true
 
 @Component({
-  selector: 'app-color-picker-mixer',
-  templateUrl: './color-picker-mixer.component.html',
-  styleUrls: ['./color-picker-mixer.component.scss']
+    selector: 'app-color-picker-mixer',
+    templateUrl: './color-picker-mixer.component.html',
+    styleUrls: ['./color-picker-mixer.component.scss'],
+    standalone: false
 })
 export class ColorPickerMixerComponent extends ColorPickerBaseComponent implements AfterViewInit {
   @ViewChild('canvasBox')

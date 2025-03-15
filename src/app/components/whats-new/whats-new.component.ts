@@ -2,9 +2,10 @@ import {AfterViewInit, Component} from '@angular/core';
 import {GLOBALS} from '@/_services/globals.service';
 
 @Component({
-  selector: 'app-whats-new',
-  templateUrl: './whats-new.component.html',
-  styleUrls: ['./whats-new.component.scss']
+    selector: 'app-whats-new',
+    templateUrl: './whats-new.component.html',
+    styleUrls: ['./whats-new.component.scss'],
+    standalone: false
 })
 export class WhatsNewComponent implements AfterViewInit {
 

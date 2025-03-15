@@ -7,9 +7,10 @@ class Num {
 }
 
 @Component({
-  selector: 'app-site-prime-numbers',
-  templateUrl: './site-prime-numbers.component.html',
-  styleUrls: ['./site-prime-numbers.component.scss']
+    selector: 'app-site-prime-numbers',
+    templateUrl: './site-prime-numbers.component.html',
+    styleUrls: ['./site-prime-numbers.component.scss'],
+    standalone: false
 })
 export class SitePrimeNumbersComponent {
 

@@ -5,9 +5,10 @@ import {Utils} from '@/classes/utils';
 import {FormConfig} from '@/forms/form-config';
 
 @Component({
-  selector: 'app-site-pdf',
-  templateUrl: './site-pdf.component.html',
-  styleUrls: ['./site-pdf.component.scss']
+    selector: 'app-site-pdf',
+    templateUrl: './site-pdf.component.html',
+    styleUrls: ['./site-pdf.component.scss'],
+    standalone: false
 })
 export class SitePdfComponent implements AfterViewInit {
   text: any;

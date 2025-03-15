@@ -28,7 +28,6 @@ export class LanguageService {
       langCode = JSON.parse(localStorage.getItem('webData'))?.w0 ?? 'en-GB';
     }
     let lng = (messages as any).default.find((lang: any) => lang.id === langCode);
-    console.log(lng);
     if (lng == null) {
       lng = (messages as any).default[0];
     }

@@ -9,21 +9,20 @@ import {DialogResultButton} from '@/_model/dialog-data';
 import {RubikCube, RubikCubicle} from '@/_model/rubik-data';
 
 @Component({
-  selector: 'app-site-rubik',
-  templateUrl: './site-rubik.component.html',
-  styleUrls: ['./site-rubik.component.scss'],
-  animations: [
-    trigger('doturn', [
-        transition('_ => *', [
-            animate(`{{speed}}s`, keyframes([
-              style({transform: `{{from}}`}),
-              style({transform: `{{to}}`})
-            ]))
-          ], {params: {from: '', to: '', speed: 0.2}}
-        )
-      ]
-    )
-  ]
+    selector: 'app-site-rubik',
+    templateUrl: './site-rubik.component.html',
+    styleUrls: ['./site-rubik.component.scss'],
+    animations: [
+        trigger('doturn', [
+            transition('_ => *', [
+                animate(`{{speed}}s`, keyframes([
+                    style({ transform: `{{from}}` }),
+                    style({ transform: `{{to}}` })
+                ]))
+            ], { params: { from: '', to: '', speed: 0.2 } })
+        ])
+    ],
+    standalone: false
 })
 
 // https://stackoverflow.com/questions/68191999/angular-animations-how-to-set-transition-timing-dynamically

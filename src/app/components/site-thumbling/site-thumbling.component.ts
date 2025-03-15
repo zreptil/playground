@@ -13,9 +13,10 @@ class CubeData {
 }
 
 @Component({
-  selector: 'app-site-thumbling',
-  templateUrl: './site-thumbling.component.html',
-  styleUrls: ['./site-thumbling.component.scss']
+    selector: 'app-site-thumbling',
+    templateUrl: './site-thumbling.component.html',
+    styleUrls: ['./site-thumbling.component.scss'],
+    standalone: false
 })
 export class SiteThumblingComponent {
   listThumbs: Thumb[];

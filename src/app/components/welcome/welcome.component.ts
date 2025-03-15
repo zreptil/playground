@@ -3,9 +3,10 @@ import {GlobalsService} from '@/_services/globals.service';
 import {SyncService} from '@/_services/sync/sync.service';
 
 @Component({
-  selector: 'app-welcome',
-  templateUrl: './welcome.component.html',
-  styleUrls: ['./welcome.component.scss']
+    selector: 'app-welcome',
+    templateUrl: './welcome.component.html',
+    styleUrls: ['./welcome.component.scss'],
+    standalone: false
 })
 export class WelcomeComponent {
   constructor(public globals: GlobalsService,

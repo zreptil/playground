@@ -15,9 +15,10 @@ import {CdkDragEnd} from '@angular/cdk/drag-drop';
 import {Point} from 'pdfmake/interfaces';
 
 @Component({
-  selector: 'app-color-cfg-dialog',
-  templateUrl: './color-cfg-dialog.component.html',
-  styleUrls: ['./color-cfg-dialog.component.scss']
+    selector: 'app-color-cfg-dialog',
+    templateUrl: './color-cfg-dialog.component.html',
+    styleUrls: ['./color-cfg-dialog.component.scss'],
+    standalone: false
 })
 export class ColorCfgDialogComponent implements AfterViewInit {
   value: string;

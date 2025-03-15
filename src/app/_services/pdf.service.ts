@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpRequest} from '@angular/common/http';
+import { HttpClient, HttpRequest } from '@angular/common/http';
 import {PageData} from '@/_model/page-data';
 import {Log} from '@/_services/log.service';
 import {GLOBALS} from '@/_services/globals.service';

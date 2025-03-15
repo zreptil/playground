@@ -5,9 +5,10 @@ import {MatDialogRef} from '@angular/material/dialog';
 import {Log} from '@/_services/log.service';
 
 @Component({
-  selector: 'app-close-button',
-  templateUrl: './close-button.component.html',
-  styleUrls: ['./close-button.component.scss']
+    selector: 'app-close-button',
+    templateUrl: './close-button.component.html',
+    styleUrls: ['./close-button.component.scss'],
+    standalone: false
 })
 export class CloseButtonComponent {
 

@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {EnvironmentService} from '@/_services/environment.service';
-import {HttpClient, HttpHeaders, HttpRequest} from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpRequest } from '@angular/common/http';
 import {encode as base64encode} from 'base64-arraybuffer';
 import {Oauth2pkce} from '@/_services/sync/oauth2pkce';
 import {lastValueFrom, Observable, of} from 'rxjs';

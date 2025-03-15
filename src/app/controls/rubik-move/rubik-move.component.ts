@@ -5,9 +5,10 @@ import {GLOBALS} from '@/_services/globals.service';
 import {RubikCube} from '@/_model/rubik-data';
 
 @Component({
-  selector: 'app-rubik-move',
-  templateUrl: './rubik-move.component.html',
-  styleUrls: ['./rubik-move.component.scss']
+    selector: 'app-rubik-move',
+    templateUrl: './rubik-move.component.html',
+    styleUrls: ['./rubik-move.component.scss'],
+    standalone: false
 })
 export class RubikMoveComponent {
   @Output()

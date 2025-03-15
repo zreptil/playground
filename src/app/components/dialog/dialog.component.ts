@@ -5,9 +5,10 @@ import {DialogData, DialogParams, DialogResultButton, DialogType, IDialogButton}
 import {Utils} from '@/classes/utils';
 
 @Component({
-  selector: 'app-dialog',
-  templateUrl: './dialog.component.html',
-  styleUrls: ['./dialog.component.scss']
+    selector: 'app-dialog',
+    templateUrl: './dialog.component.html',
+    styleUrls: ['./dialog.component.scss'],
+    standalone: false
 })
 export class DialogComponent implements OnInit, AfterViewChecked {
   readData: any;

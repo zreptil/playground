@@ -7,11 +7,10 @@ import {LogPipe} from '@/components/log/log.pipe';
 import {GLOBALS, GlobalsService} from '@/_services/globals.service';
 
 @Component({
-  imports: [CommonModule, MaterialModule, FormsModule, LogPipe],
-  standalone: true,
-  selector: 'app-log',
-  templateUrl: './log.component.html',
-  styleUrls: ['./log.component.scss']
+    imports: [CommonModule, MaterialModule, FormsModule, LogPipe],
+    selector: 'app-log',
+    templateUrl: './log.component.html',
+    styleUrls: ['./log.component.scss']
 })
 export class LogComponent implements OnInit {
   constructor(public globals: GlobalsService) {

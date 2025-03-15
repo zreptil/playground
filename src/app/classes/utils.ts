@@ -431,7 +431,7 @@ export class Utils {
 
   static toggleCase(text: string) {
     let ret = '';
-    for (let i = 0; i < text?.length ?? 0; i++) {
+    for (let i = 0; i < (text ?? '').length; i++) {
       if (text[i] >= 'a' && text[i] <= 'z') {
         ret += text[i].toUpperCase();
       } else if (text[i] >= 'A' && text[i] <= 'Z') {

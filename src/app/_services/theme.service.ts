@@ -32,8 +32,7 @@ export class ThemeService {
   restoreTheme(): void {
     const t = GLOBALS.ownTheme;
     if (t != null) {
-      const zip = new JSZip();
-      zip.loadAsync(t, {base64: true}).then(packed => {
+      JSZip.loadAsync(t, {base64: true}).then(packed => {
         packed.file('t').async('string').then(theme => {
           const src = JSON.parse(theme);
           console.log(src);

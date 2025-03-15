@@ -25,3 +25,11 @@ Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To u
 ## Further help
 
 To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+
+## Updates
+
+for updating angular to a newer version use this line in the terminal (windows powershell):
+
+_$v=xxx ; ng update @angular/core@$v @angular/cli@$v @angular/material@$v_
+
+xxx is the version number to update to.

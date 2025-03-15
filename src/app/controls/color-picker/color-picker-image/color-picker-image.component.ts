@@ -5,9 +5,10 @@ import {Log} from '@/_services/log.service';
 import {ColorPickerBaseComponent} from '@/controls/color-picker/color-picker-base.component';
 
 @Component({
-  selector: 'app-color-picker-image',
-  templateUrl: './color-picker-image.component.html',
-  styleUrls: ['./color-picker-image.component.scss']
+    selector: 'app-color-picker-image',
+    templateUrl: './color-picker-image.component.html',
+    styleUrls: ['./color-picker-image.component.scss'],
+    standalone: false
 })
 export class ColorPickerImageComponent extends ColorPickerBaseComponent implements AfterViewInit {
   @ViewChild('canvasBox')

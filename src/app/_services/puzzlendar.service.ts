@@ -3,6 +3,7 @@ import {MessageService} from '@/_services/message.service';
 import {Utils} from '@/classes/utils';
 import {ProgressService} from '@/_services/progress.service';
 import {State, WorkerService} from '@/_services/worker.service';
+import {PuzzlendarSolver} from '@/_services/puzzlendar.solver';
 
 @Injectable({
   providedIn: 'root'
@@ -10,6 +11,9 @@ import {State, WorkerService} from '@/_services/worker.service';
 export class PuzzlendarService extends WorkerService {
   static LS_SOLUTIONS_KEY = 'solutions';
   static LS_DATE_KEY = 'date';
+  // static LS_SOLUTIONS_KEY = 'solutions-test';
+  // static LS_DATE_KEY = 'date-test';
+  static LS_SOLVERPARTS_KEY = 'solverparts-test';
   board = [
     [0, 0, 0, 0, 0, 0, -1],
     [0, 0, 0, 0, 0, 0, -1],
@@ -21,12 +25,19 @@ export class PuzzlendarService extends WorkerService {
   ];
   boardString: string;
   boardDate: number;
+  partString: string;
+  solverParts: string[] = [];
   _solutions: { [key: string]: string[] };
-
+  partsColored = true;
+  
   constructor(public msg: MessageService,
               public progress: ProgressService) {
     super();
-    const temp = JSON.parse(localStorage.getItem(PuzzlendarService.LS_SOLUTIONS_KEY) ?? '{}');
+    const ps = new PuzzlendarSolver();
+    this.partString = ps.parts.reduce((a, b) => a + b.key, '');
+    PuzzlendarService.LS_SOLUTIONS_KEY += '-' + this.partString;
+    PuzzlendarService.LS_DATE_KEY += '-' + this.partString;
+    let temp = JSON.parse(localStorage.getItem(PuzzlendarService.LS_SOLUTIONS_KEY) ?? '{}');
     this._solutions = {};
     for (const key of Object.keys(temp)) {
       if (!Array.isArray(temp[key])) {
@@ -36,6 +47,11 @@ export class PuzzlendarService extends WorkerService {
       }
     }
     this.setDateToBoard(+(localStorage.getItem(PuzzlendarService.LS_DATE_KEY) ?? 101), this.board);
+    temp = localStorage.getItem(PuzzlendarService.LS_SOLVERPARTS_KEY) ?? '';
+    this.solverParts = [];
+    for (let i = 0; i < temp.length; i++) {
+      this.solverParts.push(temp[i]);
+    }
   }
 
   get isValid(): boolean {
@@ -44,8 +60,33 @@ export class PuzzlendarService extends WorkerService {
     return count === 41;
   }
 
-  solutionsFor(date: number): readonly string[] {
-    return (this._solutions[date] ?? []).filter((s: string) => s !== '*');
+  solutionsFor(date: number, filterParts = false): readonly string[] {
+    const list = this._solutions[date] ?? [];
+    let ret = list.filter((s: string, idx: number) => s !== '*' && list.indexOf(s) === idx);
+    if (filterParts && this.solverParts?.length > 0) {
+      ret = ret.filter(s => s.startsWith(this.solverParts.join('')));
+    }
+    return ret;
+  }
+
+  finalizeSolution(date: number) {
+    if (this._solutions[date].indexOf('*') < 0) {
+      this._solutions[date].splice(0, 0, '*');
+    }
+  }
+
+  saveSolution(data: any) {
+    if (this.solutionsFor(data.date) != null) {
+      this.addSolution(data.date, data.boardString);
+    } else {
+      this.setSolutionsFor(data.date, [data.boardString]);
+    }
+    for (const key of Object.keys(this._solutions)) {
+      this._solutions[key] = this._solutions[key]
+        .filter((entry, idx) => this._solutions[key].indexOf(entry) === idx && !Utils.isEmpty(entry));
+    }
+    localStorage.setItem(PuzzlendarService.LS_SOLUTIONS_KEY, JSON.stringify(this._solutions));
+    localStorage.setItem(PuzzlendarService.LS_DATE_KEY, `${this.boardDate}`);
   }
 
   addSolution(date: number, solution: string) {
@@ -66,32 +107,48 @@ export class PuzzlendarService extends WorkerService {
         this.board = data.board;
         this.boardString = data.boardString;
         this.boardDate = data.date;
+        localStorage.setItem(PuzzlendarService.LS_SOLVERPARTS_KEY, this.solverParts.join(''));
+        localStorage.setItem(PuzzlendarService.LS_DATE_KEY, `${this.boardDate}`);
         break;
       case 'solution':
+        this.boardDate = data.date;
         this.boardString = data.boardString;
-        this.progress.clear();
-        this.showSolution(data);
+        this.saveSolution(data);
+        data.state = State.idle;
         break;
       case 'partialSolution':
         this.boardDate = data.date;
         this.saveSolution(data);
         this.progress.info = `${data.date % 100}.${Math.floor(data.date / 100)}.`;
+        if (this.progress.isStopped) {
+          this.stop();
+        }
         this.progress.text = `Gefundene Lösungen: ${this.solutionsFor(data.date)?.length ?? 0}`;
         break;
       case 'progress':
+        if (this.progress.isStopped) {
+          this.stop();
+        }
         this.progress.max = data.max ?? this.progress.max;
         this.progress.value = data.value ?? this.progress.value;
         this.progress.text = data.text ?? this.progress.text;
         this.progress.info = data.info ?? this.progress.info;
-        if (this.progress.isStopped) {
-          this.stop();
-        }
         break;
       case 'finalSolution':
+        if (this._solutions[data.date] != null) {
+          this.finalizeSolution(data.date);
+          this.saveSolution(data);
+        }
         this.solve('single');
         break;
       case 'daySolution':
+      case 'oneperdaySolution':
         this.boardDate = data.date;
+        if (data.cmd === 'daySolution') {
+          if (this._solutions[data.date] != null) {
+            this.finalizeSolution(data.date);
+          }
+        }
         this.saveSolution(data);
         let m = Math.floor(data.date / 100);
         let d = data.date % 100;
@@ -102,8 +159,12 @@ export class PuzzlendarService extends WorkerService {
         }
         if (m < 13) {
           this.setDateToBoard(m * 100 + d, data.board);
-          this.solve('all');
+          this.solve(data.cmd === 'daySolution' ? 'all' : 'oneperday');
         }
+        break;
+      case 'noSolutionForDay':
+        data.state = State.idle;
+        this.msg.info(`Der Teilesatz ${this.partString} ergibt keine Lösung für den ${data.date % 100}.${Math.floor(data.date / 100)}.`);
         break;
     }
     if (data.state != null) {
@@ -133,16 +194,6 @@ export class PuzzlendarService extends WorkerService {
 
   setBoard() {
     this.postMessage({cmd: 'setBoard', board: this.board});
-  }
-
-  saveSolution(data: any) {
-    if (this.solutionsFor(data.date) != null) {
-      this.addSolution(data.date, data.boardString);
-    } else {
-      this.setSolutionsFor(data.date, [data.boardString]);
-    }
-    localStorage.setItem(PuzzlendarService.LS_SOLUTIONS_KEY, JSON.stringify(this._solutions));
-    localStorage.setItem(PuzzlendarService.LS_DATE_KEY, `${this.boardDate}`);
   }
 
   showSolution(data: any) {
@@ -183,6 +234,12 @@ export class PuzzlendarService extends WorkerService {
     this.progress.value = 0;
     this.progress.info = `${this.boardDate % 100}.${Math.floor(this.boardDate / 100)}.`;
     this.progress.text = `Gefundene Lösungen: ${this.solutionsFor(this.boardDate)?.length ?? 0}`;
-    this.postMessage({cmd: `solve-${type}`, board: this.board, found: this.solutionsFor(this.boardDate)});
+    let found = this._solutions[this.boardDate] ?? [];
+    // switch (type) {
+    //   case 'single':
+    //     found = [this.boardString];
+    //     break;
+    // }
+    this.postMessage({cmd: `solve-${type}`, board: this.board, alreadyFound: found});
   }
 }

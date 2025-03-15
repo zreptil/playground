@@ -1,11 +1,16 @@
 <app-progress></app-progress>
-<div board>
+<mat-slide-toggle (change)="toggleColored($event)" [checked]="ps.partsColored">Farbige Teile</mat-slide-toggle>
+<br>
+<div [class]="classForBoard" board>
   <table [class]="classForState">
     @for (row of ps.board; let y = $index; track y) {
       <tr>
         @for (cell of row; let x = $index; track x) {
-          <td (click)="clickCell($event, row, x)">
-            <div class="c{{cell}}">{{ content[y]?.[x] }}</div>
+          <td (click)="clickCell($event, x, y)" [class]="classForCell(x, y)">
+            <div container>
+              <div content>{{ cellContent(x, y) }}</div>
+              <div info>{{ cellInfo(x, y) }}</div>
+            </div>
           </td>
         }
       </tr>
@@ -15,10 +20,29 @@
     <div solution>{{ ps.boardString?.toUpperCase() }}</div>
   }
 </div>
-<button (click)="clickSolve($event, 'single')" [disabled]="!ps.isValid || ps.isWorking" mat-button>{{ msgSolve }}</button>
-@if (ps.solutionsFor(ps.boardDate) != null) {
-  <button (click)="clickTest($event, ps.boardDate)" [disabled]="!ps.isValid || ps.isWorking" mat-button>{{ msgSolution }}</button>
+<div>
+  @for (part of srv.parts; track $index) {
+    <button (click)="clickPart($event, part.key)" mat-button part [class]="classForPart(part.key)">
+      {{ part.key }}
+    </button>
+  }
+</div>
+<button (click)="clickTest($event, ps.solverParts.join(''))" [disabled]="!ps.isValid || ps.isWorking || ps.solverParts.length < srv.parts.length" mat-button>
+  {{ ps.solverParts.join('').toUpperCase() }}
+</button>
+@if ((ps._solutions[ps?.boardDate]?.indexOf('*') ?? -1) < 0) {
+  <button (click)="clickSolve($event, 'single')" [disabled]="!ps.isValid || ps.isWorking" mat-button>{{ msgSolve }}</button>
 }
-<button (click)="clickSolve($event, 'day')" [disabled]="!ps.isValid || ps.isWorking" mat-button>Tageslösungen ermitteln</button>
+@if (ps.solutionsFor(ps.boardDate).length > 0) {
+  <button (click)="clickTest($event, ps.boardDate, true)" [disabled]="!ps.isValid || ps.isWorking" mat-button>{{ msgSolution }}</button>
+}
+@if (ps._solutions[ps?.boardDate]?.indexOf('*') < 0) {
+  <button (click)="clickSolve($event, 'day')" [disabled]="!ps.isValid || ps.isWorking" mat-button>Tageslösungen ermitteln</button>
+}
+<button (click)="clickSolve($event, 'oneperday')" [disabled]="!ps.isValid || ps.isWorking" mat-button>Eine Lösung pro Tag ermitteln</button>
 <button (click)="clickSolve($event, 'all')" [disabled]="!ps.isValid || ps.isWorking" mat-button>Alle Lösungen ermitteln</button>
 <button (click)="clickClear($event)" [disabled]="!ps.isValid || ps.isWorking" mat-button>Lösungen für den Tag löschen</button>
+<div limits>
+  <div>Max {{ maxSolutions }}</div>
+  <div>Min {{ minSolutions }}</div>
+</div>

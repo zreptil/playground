@@ -19,9 +19,10 @@ class Num {
 }
 
 @Component({
-  selector: 'app-site-collatz',
-  templateUrl: './site-collatz.component.html',
-  styleUrls: ['./site-collatz.component.scss']
+    selector: 'app-site-collatz',
+    templateUrl: './site-collatz.component.html',
+    styleUrls: ['./site-collatz.component.scss'],
+    standalone: false
 })
 export class SiteCollatzComponent {
   form: FormGroup;

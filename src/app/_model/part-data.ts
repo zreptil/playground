@@ -10,17 +10,17 @@ export class Point {
 
 export class PartData {
   pos: [number, number][];
-  mod = 0;
+  mod: number = 0;
   max: Point;
   min: Point;
 
   modCounter = 0;
 
-  constructor(public key: string, public idx: number, _pos: [number, number][]) {
-    this.pos = _pos?.map(p => p);
-    this.min = new Point(0, 0);
-    this.max = new Point(7, 7);
-    this.currPos = new Point(0, 0);
+  constructor(public key: string,
+              public idx: number,
+              private _pos: [number, number][],
+              public skipMod: number[] = []) {
+    this.reset();
   }
 
   private _currPos: Point;
@@ -32,6 +32,23 @@ export class PartData {
   set currPos(value: Point) {
     this._currPos = value;
     this.calcLimits();
+  }
+
+  reset() {
+    this.pos = this._pos?.map(p => p) ?? [];
+    this.pos.splice(0, 0, [0, 0]);
+    this.min = new Point(0, 0);
+    this.max = new Point(7, 7);
+    this.currPos = new Point(0, 0);
+    this.mod = 0;
+  }
+
+  maxPos(org: Point): Point {
+    return new Point(org.x + this.min.x, org.y + this.min.y);
+  }
+
+  minPos(org: Point): Point {
+    return new Point(org.x - (7 - this.max.x), org.y - (7 - this.max.y));
   }
 
   calcLimits() {
@@ -83,14 +100,10 @@ export class PartData {
         break;
     }
     this.mod++;
-    this.calcLimits();
-  }
-
-  reset() {
-    while (this.mod !== 0) {
+    if (this.skipMod.indexOf(this.mod) >= 0) {
       this.modify();
+    } else {
+      this.calcLimits();
     }
   }
-
 }
-

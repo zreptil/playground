@@ -3,9 +3,10 @@ import {MessageService} from '@/_services/message.service';
 import {ColorCfgDialogComponent} from '@/controls/color-cfg/color-cfg-dialog/color-cfg-dialog.component';
 
 @Component({
-  selector: 'color-cfg',
-  templateUrl: './color-cfg.component.html',
-  styleUrls: ['./color-cfg.component.scss']
+    selector: 'color-cfg',
+    templateUrl: './color-cfg.component.html',
+    styleUrls: ['./color-cfg.component.scss'],
+    standalone: false
 })
 export class ColorCfgComponent {
 

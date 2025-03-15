@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {Utils} from '@/classes/utils';
 import {Log} from '@/_services/log.service';
-import {HttpClient, HttpRequest} from '@angular/common/http';
+import { HttpClient, HttpRequest } from '@angular/common/http';
 import {lastValueFrom, throwError, timeout} from 'rxjs';
 import {oauth2SyncType} from '@/_services/sync/oauth2pkce';
 import {SyncService} from '@/_services/sync/sync.service';

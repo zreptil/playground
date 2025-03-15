@@ -10,7 +10,7 @@ import {ColorPickerBaseComponent} from '@/controls/color-picker/color-picker-bas
 import {WelcomeComponent} from '@/components/welcome/welcome.component';
 import {MainComponent} from '@/components/main/main.component';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {HttpClientModule} from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import {MaterialModule} from '@/material.module';
 import {DragDropModule} from '@angular/cdk/drag-drop';
 import {LogComponent} from '@/components/log/log.component';
@@ -35,48 +35,41 @@ import {ColorPickerSliderComponent} from '@/controls/color-picker/color-picker-s
 import {SiteCollatzComponent} from '@/components/site-collatz/site-collatz.component';
 import {SitePuzzlendarComponent} from '@/components/site-puzzlendar/site-puzzlendar.component';
 
-@NgModule({
-  declarations: [
-    AutofocusDirective,
-    AppComponent,
-    DialogComponent,
-    ColorPickerComponent,
-    ColorPickerDialog,
-    ColorPickerImageComponent,
-    ColorPickerMixerComponent,
-    ColorPickerBaseComponent,
-    CloseButtonComponent,
-    ColorCfgComponent,
-    ColorCfgDialogComponent,
-    ColorPickerHslComponent,
-    ColorPickerSliderComponent,
-    WhatsNewComponent,
-    MainComponent,
-    WelcomeComponent,
-    ImpressumComponent,
-    SiteThumblingComponent,
-    SitePrimeNumbersComponent,
-    SiteRubikComponent,
-    RubikMoveComponent,
-    HideMissingImageDirective,
-    SitePdfComponent,
-    SiteCollatzComponent,
-  ],
-  imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    FormsModule,
-    MaterialModule,
-    HttpClientModule,
-    DragDropModule,
-    LogComponent,
-    ProgressComponent,
-    NgOptimizedImage,
-    ReactiveFormsModule,
-    SitePuzzlendarComponent
-  ],
-  providers: [provideAnimations()],
-  bootstrap: [AppComponent]
-})
+@NgModule({ declarations: [
+        AutofocusDirective,
+        AppComponent,
+        DialogComponent,
+        ColorPickerComponent,
+        ColorPickerDialog,
+        ColorPickerImageComponent,
+        ColorPickerMixerComponent,
+        ColorPickerBaseComponent,
+        CloseButtonComponent,
+        ColorCfgComponent,
+        ColorCfgDialogComponent,
+        ColorPickerHslComponent,
+        ColorPickerSliderComponent,
+        WhatsNewComponent,
+        MainComponent,
+        WelcomeComponent,
+        ImpressumComponent,
+        SiteThumblingComponent,
+        SitePrimeNumbersComponent,
+        SiteRubikComponent,
+        RubikMoveComponent,
+        HideMissingImageDirective,
+        SitePdfComponent,
+        SiteCollatzComponent,
+    ],
+    bootstrap: [AppComponent], imports: [BrowserModule,
+        BrowserAnimationsModule,
+        FormsModule,
+        MaterialModule,
+        DragDropModule,
+        LogComponent,
+        ProgressComponent,
+        NgOptimizedImage,
+        ReactiveFormsModule,
+        SitePuzzlendarComponent], providers: [provideAnimations(), provideHttpClient(withInterceptorsFromDi())] })
 export class AppModule {
 }
