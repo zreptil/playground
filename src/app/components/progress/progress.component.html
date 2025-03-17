@@ -1,11 +1,19 @@
 <div [class]="classForOverlay(!ps.isActive)" overlay>
   <div #overlay panel>
-    <div *ngIf="ps.info!=null" label>{{ps.info}}</div>
-    <mat-progress-bar [value]="value"
-                      mode="determinate"></mat-progress-bar>
-    <div label>{{ps.text}}</div>
-    <button (click)="ps.cancel()" *ngIf="ps.mayCancel" mat-icon-button>
-      <mat-icon>cancel</mat-icon>
-    </button>
+    @if (ps.info != null) {
+      <div label>{{ ps.info }}</div>
+    }
+    <div progress>
+      <mat-progress-bar [value]="value" mode="determinate"></mat-progress-bar>
+      @if (ps.showCurrent) {
+        <div current>{{ currentText }}</div>
+      }
+    </div>
+    <div label>{{ ps.text }}</div>
+    @if (ps.mayCancel) {
+      <button (click)="ps.cancel()" mat-icon-button>
+        <mat-icon>cancel</mat-icon>
+      </button>
+    }
   </div>
 </div>

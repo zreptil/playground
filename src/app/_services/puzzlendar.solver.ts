@@ -1,34 +1,118 @@
 import {PartData, Point} from '@/_model/part-data';
+import {BoardData} from '@/_model/board-data';
+
+export class PartManager {
+  setCurrPos(part: PartData, value: Point) {
+    part.currPos = value;
+    this.calcLimits(part);
+  }
+
+  calcLimits(part: PartData) {
+    part.min.x = -part.pos.reduce((v, p) => p[0] < v ? p[0] : v, 0);
+    part.min.y = -part.pos.reduce((v, p) => p[1] < v ? p[1] : v, 0);
+    part.max.x = 7 - part.pos.reduce((v, p) => p[0] > v ? p[0] : v, -Infinity);
+    part.max.y = 6 - part.pos.reduce((v, p) => p[1] > v ? p[1] : v, -Infinity);
+  }
+
+  reset(part: PartData) {
+    part.pos = part.orgPos?.map(p => p) ?? [];
+    part.pos.splice(0, 0, [0, 0]);
+    part.min = new Point(0, 0);
+    part.max = new Point(8, 7);
+    this.setCurrPos(part, new Point(0, 0));
+    part.mod = 0;
+  }
+
+  fill(part: PartData, src: PartData) {
+    part.key = src.key;
+    part.idx = src.idx;
+    part.mod = src.mod;
+    part.currPos ??= src.currPos;
+    part.currPos.set(src.currPos);
+    part.pos = [];
+    for (const pos of src.pos) {
+      part.pos.push(pos);
+    }
+  }
+
+  maxPos(part: PartData, org: Point): Point {
+    return new Point(org.x + part.min.x, org.y + part.min.y);
+  }
+
+  minPos(part: PartData, org: Point): Point {
+    return new Point(org.x - (8 - part.max.x), org.y - (7 - part.max.y));
+  }
+
+  mirror(part: PartData) {
+    part.pos = part.pos.map(p => [p[0], -p[1]]);
+    // if (part.key >= 'a' && part.key <= 'z') {
+    //   part.key = part.key.toUpperCase();
+    // } else {
+    //   part.key = part.key.toLowerCase();
+    // }
+  }
+
+  rotate(part: PartData) {
+    part.pos = part.pos.map(p => [-p[1], p[0]]);
+  }
+
+  modify(part: PartData) {
+    part.modCounter++;
+    switch (part.mod) {
+      case 0:
+      case 1:
+      case 2:
+      case 4:
+      case 5:
+      case 6:
+      case 7:
+        this.rotate(part);
+        break;
+      case 3:
+        this.rotate(part);
+        this.mirror(part);
+        break;
+      case 8:
+        this.rotate(part);
+        this.mirror(part);
+        part.mod = -1;
+        break;
+    }
+    part.mod++;
+    if (part.skipMod.indexOf(part.mod) >= 0) {
+      this.modify(part);
+    } else {
+      this.calcLimits(part);
+    }
+  }
+}
 
 export class PuzzlendarSolver {
-  board: number[][];
-  parts: PartData[] = [
-    new PartData('u', 1, [[0, 1], [1, 1], [2, 1], [2, 0]], [4, 5, 6, 7]),
-    new PartData('n', 2, [[0, 1], [0, 2], [-1, 2], [-1, 3]]),
-//    new PartData('f', 2, [[1, 0], [2, 0], [1, -1], [2, 1]]),
-    new PartData('z', 3, [[-1, 0], [-1, 1], [-1, 2], [-2, 2]], [2, 3, 6, 7]),
-    new PartData('v', 4, [[0, 1], [0, 2], [1, 2], [2, 2]], [4, 5, 6, 7]),
-    new PartData('m', 5, [[1, 0], [0, 1], [1, 1], [0, 2], [1, 2]], [2, 3, 4, 5, 6, 7]),
-    new PartData('y', 6, [[1, 0], [2, 0], [3, 0], [1, 1]]),
-//    new PartData('x', 6, [[1, 0], [0, 1], [-1, 0], [0, -1]]),
-    new PartData('l', 7, [[0, 1], [0, 2], [0, 3], [1, 3]]),
-//    new PartData('t', 7, [[0, 1], [0, 2], [1, 1], [2, 1]]),
-    new PartData('p', 8, [[1, 0], [2, 0], [1, 1], [2, 1]])
-  ];
+  static _permutate: string[];
+  pm = new PartManager();
+
+  constructor(public board: BoardData) {
+    for (const part of this.parts) {
+      this.pm.reset(part);
+    }
+  }
+
+  get parts(): PartData[] {
+    return this.board.parts;
+  }
 
   get isValid(): boolean {
-    const count = this.board.reduce((acc, row) =>
-      acc + row.reduce((acc, cell) => acc + (cell >= 0 && cell <= 8 ? 1 : 0), 0), 0);
-
-    return count === 41;
+    const count = this.board.rows.reduce((acc, row) =>
+      acc + row.reduce((acc, cell) => acc + (cell >= 0 && cell <= this.board.parts.length ? 1 : 0), 0), 0);
+    return count === this.board.validCount;
   }
 
   get boardString(): string {
     let ret = '';
-    for (const row of this.board) {
+    for (const row of this.board.rows) {
       for (let i = 0; i < row.length; i++) {
         const p = row[i];
-        if (p >= 1 && p <= 8 && ret.indexOf(this.parts[p - 1].key) < 0) {
+        if (p >= 1 && p <= this.board.parts.length && ret.indexOf(this.parts[p - 1].key) < 0) {
           ret += this.parts[p - 1].key;
         }
       }
@@ -37,34 +121,21 @@ export class PuzzlendarSolver {
   }
 
   get boardData(): any {
-    let date = 0;
-    for (let y = 0; y < this.board.length; y++) {
-      for (let x = 0; x < this.board[y].length; x++) {
-        if (this.board[y][x] === 9) {
-          if (y < 2) {
-            date += 100 * (y * 6 + x + 1);
-          } else {
-            date += (y - 2) * 7 + x + 1;
-          }
-        }
-      }
-    }
     return {
-      board: this.board,
-      boardString: this.boardString,
-      date: date
+      brd: this.board,
+      boardString: this.boardString
     };
   }
 
-  clearBoard(part?: PartData, board = this.board): void {
-    for (const row of board) {
+  clearBoard(part?: PartData, brd = this.board): void {
+    for (const row of brd.rows) {
       for (let i = 0; i < row.length; i++) {
         if (part?.idx != null) {
           if (row[i] === part.idx) {
             row[i] = 0;
           }
         } else {
-          if (row[i] !== 9 && row[i] !== -1) {
+          if (row[i] !== 99 && row[i] !== -1) {
             row[i] = 0;
           }
         }
@@ -103,7 +174,10 @@ export class PuzzlendarSolver {
     this.clearBoard();
     let perms = [single];
     if (single == null) {
-      perms = this.permutate(this.parts.map(p => p.key).join(''));
+      if (PuzzlendarSolver._permutate == null) {
+        PuzzlendarSolver._permutate = this.permutate(this.parts.map(p => p.key).join(''));
+      }
+      perms = PuzzlendarSolver._permutate;
     }
     let idx = 0;
     let b: number[][] = null;
@@ -119,12 +193,13 @@ export class PuzzlendarSolver {
           lastProgress++;
           if (lastProgress > 1000) {
             lastProgress = 0;
+//            postMessage({cmd: 'progress', max: perms.length, value: idx});
             postMessage({cmd: 'progress', max: perms.length, value: idx});
           }
           if (this.placeParts(src)) {
             if (type === 'solve-day' || type === 'solve-all') {
               if (b == null) {
-                b = this.board.map(row => row.map(f => f));
+                b = this.board.rows.map(row => row.map(f => f));
               }
               lastProgress = 0;
               postMessage({cmd: 'partialSolution', ...this.boardData});
@@ -149,7 +224,7 @@ export class PuzzlendarSolver {
         break;
       case 'solve-day':
         if (b != null) {
-          this.board = b;
+          this.board.rows = b;
         }
         postMessage({cmd: 'finalSolution', ...this.boardData});
         break;
@@ -163,13 +238,13 @@ export class PuzzlendarSolver {
     }
   }
 
-  nextFreeField(pt: Point, board: number[][]): Point {
-    while (board[pt.y][pt.x] !== 0) {
+  nextFreeField(pt: Point, brd: BoardData): Point {
+    while (brd.rows[pt.y][pt.x] !== 0) {
       pt.x++;
-      if (pt.x >= 7) {
+      if (pt.x >= brd.rows[pt.y].length) {
         pt.x = 0;
         pt.y++;
-        if (pt.y >= 7) {
+        if (pt.y >= brd.rows.length) {
           return null;
         }
       }
@@ -177,25 +252,26 @@ export class PuzzlendarSolver {
     return pt;
   }
 
-  firstFreeField(board: number[][]): Point {
-    return this.nextFreeField(new Point(0, 0), board);
+  firstFreeField(brd: BoardData): Point {
+    return this.nextFreeField(new Point(0, 0), brd);
   }
 
-  placeParts(partKeys: string, board = this.board) {
+  placeParts(partKeys: string, brd = this.board) {
     this.clearBoard();
     const partList = this.parts;//new PartData(p.key, p.idx, p.mod, p.pos));
     const parts: PartData[] = [];
     for (let i = 0; i < partKeys.length; i++) {
+//      const idx = partList.findIndex(p => p?.key?.toLowerCase() === partKeys.substring(i, i + 1)?.toLowerCase());
       const idx = partList.findIndex(p => p?.key === partKeys.substring(i, i + 1));
       if (idx >= 0) {
         partList[idx].modCounter = 0;
         parts.push(partList[idx]);
       }
     }
-    return this.nextPart(parts, board);
+    return this.nextPart(parts, brd);
   }
 
-  nextPart(orgParts: PartData[], board = this.board): boolean {
+  nextPart(orgParts: PartData[], brd = this.board): boolean {
     if (orgParts.length === 0) {
       return true;
     }
@@ -205,13 +281,13 @@ export class PuzzlendarSolver {
     for (let i = 0; i < 8; i++) {
 //      console.log(`${i}-${part.key}${part.mod}`);
       const savePart = new PartData(null, null, []);
-      savePart.fill(part);
-      const pt = this.firstFreeField(board);
+      this.pm.fill(savePart, part);
+      const pt = this.firstFreeField(brd);
       this.debug(part, 'neuer Punkt', part.key, part.mod, pt);
       this.debugPart(part);
-      const p = this.placePart(part, pt, board);
+      const p = this.placePart(part, pt, brd);
       if (p != null) {
-        if (this.nextPart(parts, board)) {
+        if (this.nextPart(parts, brd)) {
           return true;
         }
 //         this.debug(part, part.key, part.mod, 'passt', parts);
@@ -229,28 +305,28 @@ export class PuzzlendarSolver {
       }
       this.debugBoard(pt);
       this.clearBoard(part);
-      part.fill(savePart);
-      part.modify();
+      this.pm.fill(part, savePart);
+      this.pm.modify(part);
     }
-    part.reset();
+    this.pm.reset(part);
     return false;
   }
 
-  placePart(part: PartData, org: Point, board: number[][]): PartData {
+  placePart(part: PartData, org: Point, brd: BoardData): PartData {
     part.currPos.set(org);
-    part.calcLimits();
+    this.pm.calcLimits(part);
     this.debugPart(part);
-    while (part.currPos.y <= part.maxPos(org).y) {
-      while (part.currPos.x <= part.maxPos(org).x) {
+    while (part.currPos.y <= this.pm.maxPos(part, org).y) {
+      while (part.currPos.x <= this.pm.maxPos(part, org).x) {
         // while (part.currPos.y <= part.max.y) {
         //   while (part.currPos.x <= part.max.x) {
-        this.clearBoard(part, board);
+        this.clearBoard(part, brd);
         let onPoint = false;
         let list = part.pos.map(p => p);
         for (let i = 0; i < list.length; i++) {
           const x = part.currPos.x + list[i][0];
           const y = part.currPos.y + list[i][1];
-          if (x < 0 || x > 6 || y < 0 || y > 6 || board[y][x] !== 0) {
+          if (y < 0 || y >= brd.rows.length || x < 0 || x >= brd.rows[y].length || brd.rows[y][x] !== 0) {
             // this.debug(part, 'passt nicht', `x${part.currPos.x}y${part.currPos.y}`, part.key, part.mod, `i${i} x${x} y${y}`, part);
             onPoint = false;
             i = list.length
@@ -263,22 +339,22 @@ export class PuzzlendarSolver {
         if (onPoint) {
           this.debug(part, part.key, part.mod, 'passt auf', org);
           for (const pos of list) {
-            board[part.currPos.y + pos[1]][part.currPos.x + pos[0]] = part.idx;
+            brd.rows[part.currPos.y + pos[1]][part.currPos.x + pos[0]] = part.idx;
           }
           return part;
         }
         part.currPos.x++;
-        part.calcLimits();
+        this.pm.calcLimits(part);
       }
-      part.currPos.x = part.minPos(org).x;
+      part.currPos.x = this.pm.minPos(part, org).x;
       // part.currPos.x = part.min.x;
       part.currPos.y++;
-      part.calcLimits();
+      this.pm.calcLimits(part);
     }
     part.currPos.set(org);
-    part.calcLimits();
+    this.pm.calcLimits(part);
     this.debug(part, part.key, part.mod, 'passt auf keine Position');
-    part.reset();
+    this.pm.reset(part);
     return null;
   }
 
@@ -291,7 +367,7 @@ export class PuzzlendarSolver {
   debugBoard(mark: Point, title?: string) {
     return;
     const msg = [title,
-      this.board.map((row, y) => {
+      this.board.rows.map((row, y) => {
         return row.map((cell, x) => {
           let ret = `${cell}`;
           const suffix = (x === mark?.x && y === mark?.y) ? '<' : ' ';
@@ -303,7 +379,7 @@ export class PuzzlendarSolver {
             case 0:
               ret = '-';
               break;
-            case 9:
+            case 99:
               ret = '*';
               break;
 
@@ -317,9 +393,9 @@ export class PuzzlendarSolver {
 
   debugPart(part: PartData) {
     const area: any[] = [];
-    for (let y = 0; y < 7; y++) {
+    for (let y = 0; y < this.board.rows.length; y++) {
       const row = [];
-      for (let x = 0; x < 7; x++) {
+      for (let x = 0; x < this.board.rows[y].length; x++) {
         row.push(0);
       }
       area.push(row);

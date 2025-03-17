@@ -3,8 +3,8 @@ import {PuzzlendarSolver} from '@/_services/puzzlendar.solver';
 
 addEventListener('message', ({data}) => {
   try {
-    const srv = new PuzzlendarSolver();
-    srv.board = data.board ?? srv.board;
+    const srv = new PuzzlendarSolver(data.brd);
+    // srv.board = data.brd ?? srv.board;
     switch (data.cmd) {
       case 'clearBoard':
         srv.clearBoard();
@@ -26,7 +26,7 @@ addEventListener('message', ({data}) => {
             postMessage({cmd: 'solution', ...srv.boardData});
           }
         } else {
-          postMessage({error: `Es müssen genau zwei Felder ausgewählt sein`, state: 0});
+          postMessage({error: `Es konnte keine Lösung gefunden werden`, state: 0});
         }
         break;
       default:

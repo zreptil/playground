@@ -3,6 +3,7 @@ import {MessageService} from '@/_services/message.service';
 import {Utils} from '@/classes/utils';
 import {ProgressService} from '@/_services/progress.service';
 import {State, WorkerService} from '@/_services/worker.service';
+import {BoardData, BoardType} from '@/_model/board-data';
 import {PuzzlendarSolver} from '@/_services/puzzlendar.solver';
 
 @Injectable({
@@ -11,32 +12,25 @@ import {PuzzlendarSolver} from '@/_services/puzzlendar.solver';
 export class PuzzlendarService extends WorkerService {
   static LS_SOLUTIONS_KEY = 'solutions';
   static LS_DATE_KEY = 'date';
-  // static LS_SOLUTIONS_KEY = 'solutions-test';
-  // static LS_DATE_KEY = 'date-test';
   static LS_SOLVERPARTS_KEY = 'solverparts-test';
-  board = [
-    [0, 0, 0, 0, 0, 0, -1],
-    [0, 0, 0, 0, 0, 0, -1],
-    [0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, -1, -1, -1, -1]
-  ];
+  brd: BoardData;
   boardString: string;
-  boardDate: number;
   partString: string;
   solverParts: string[] = [];
   _solutions: { [key: string]: string[] };
   partsColored = true;
-  
+  showImmediate = false;
+  srv: PuzzlendarSolver;
+
   constructor(public msg: MessageService,
               public progress: ProgressService) {
     super();
-    const ps = new PuzzlendarSolver();
-    this.partString = ps.parts.reduce((a, b) => a + b.key, '');
-    PuzzlendarService.LS_SOLUTIONS_KEY += '-' + this.partString;
-    PuzzlendarService.LS_DATE_KEY += '-' + this.partString;
+//    this.brd = new BoardData(BoardType.dragonfjord);
+    this.brd = new BoardData(BoardType.pentomino);
+    this.srv = new PuzzlendarSolver(this.brd);
+    this.partString = this.brd.parts.reduce((a, b) => a + b.key, '');
+    PuzzlendarService.LS_SOLUTIONS_KEY += '-' + this.brd.type + '-' + this.partString;
+    PuzzlendarService.LS_DATE_KEY += '-' + this.brd.type + '-' + this.partString;
     let temp = JSON.parse(localStorage.getItem(PuzzlendarService.LS_SOLUTIONS_KEY) ?? '{}');
     this._solutions = {};
     for (const key of Object.keys(temp)) {
@@ -46,7 +40,7 @@ export class PuzzlendarService extends WorkerService {
         this._solutions[key] = temp[key];
       }
     }
-    this.setDateToBoard(+(localStorage.getItem(PuzzlendarService.LS_DATE_KEY) ?? 101), this.board);
+    this.setDateToBoard(+(localStorage.getItem(PuzzlendarService.LS_DATE_KEY)), this.brd);
     temp = localStorage.getItem(PuzzlendarService.LS_SOLVERPARTS_KEY) ?? '';
     this.solverParts = [];
     for (let i = 0; i < temp.length; i++) {
@@ -55,9 +49,35 @@ export class PuzzlendarService extends WorkerService {
   }
 
   get isValid(): boolean {
-    const count = this.board.reduce((acc, row) =>
-      acc + row.reduce((acc, cell) => acc + (cell >= 0 && cell <= 8 ? 1 : 0), 0), 0);
-    return count === 41;
+    const count = this.brd.rows.reduce((acc, row) =>
+      acc + row.reduce((acc, cell) => acc + (cell >= 0 && cell <= this.brd.parts.length ? 1 : 0), 0), 0);
+    return count === this.brd.validCount;
+  }
+
+  readDateFromBoard() {
+    let date = 0;
+    for (let y = 0; y < this.brd.rows.length; y++) {
+      for (let x = 0; x < this.brd.rows[y].length; x++) {
+        if (this.brd.rows[y][x] === 99) {
+          const key = `${x}${y}`;
+          let idx = BoardData.weekdays(this.brd.type).indexOf(key);
+          if (idx >= 0) {
+            date += 10000 * idx;
+          } else {
+            idx = BoardData.months(this.brd.type).indexOf(key);
+            if (idx >= 0) {
+              date += 100 * (idx + 1);
+            } else {
+              idx = BoardData.days(this.brd.type).indexOf(key);
+              if (idx >= 0) {
+                date += idx + 1;
+              }
+            }
+          }
+        }
+      }
+    }
+    this.brd.date = date;
   }
 
   solutionsFor(date: number, filterParts = false): readonly string[] {
@@ -76,17 +96,17 @@ export class PuzzlendarService extends WorkerService {
   }
 
   saveSolution(data: any) {
-    if (this.solutionsFor(data.date) != null) {
-      this.addSolution(data.date, data.boardString);
+    if (this.solutionsFor(data.brd.date) != null) {
+      this.addSolution(data.brd.date, data.boardString);
     } else {
-      this.setSolutionsFor(data.date, [data.boardString]);
+      this.setSolutionsFor(data.brd.date, [data.boardString]);
     }
     for (const key of Object.keys(this._solutions)) {
       this._solutions[key] = this._solutions[key]
         .filter((entry, idx) => this._solutions[key].indexOf(entry) === idx && !Utils.isEmpty(entry));
     }
     localStorage.setItem(PuzzlendarService.LS_SOLUTIONS_KEY, JSON.stringify(this._solutions));
-    localStorage.setItem(PuzzlendarService.LS_DATE_KEY, `${this.boardDate}`);
+    localStorage.setItem(PuzzlendarService.LS_DATE_KEY, `${data.brd.date}`);
   }
 
   addSolution(date: number, solution: string) {
@@ -104,26 +124,24 @@ export class PuzzlendarService extends WorkerService {
     }
     switch (data.cmd) {
       case 'setBoard':
-        this.board = data.board;
+        this.brd = data.brd;
+        this.readDateFromBoard();
         this.boardString = data.boardString;
-        this.boardDate = data.date;
         localStorage.setItem(PuzzlendarService.LS_SOLVERPARTS_KEY, this.solverParts.join(''));
-        localStorage.setItem(PuzzlendarService.LS_DATE_KEY, `${this.boardDate}`);
+        localStorage.setItem(PuzzlendarService.LS_DATE_KEY, `${data.brd.date}`);
         break;
       case 'solution':
-        this.boardDate = data.date;
         this.boardString = data.boardString;
         this.saveSolution(data);
         data.state = State.idle;
         break;
       case 'partialSolution':
-        this.boardDate = data.date;
         this.saveSolution(data);
-        this.progress.info = `${data.date % 100}.${Math.floor(data.date / 100)}.`;
+        this.setProgressInfo(data.brd);
         if (this.progress.isStopped) {
           this.stop();
         }
-        this.progress.text = `Gefundene Lösungen: ${this.solutionsFor(data.date)?.length ?? 0}`;
+        this.progress.text = `Gefundene Lösungen: ${this.solutionsFor(data.brd.date)?.length ?? 0}`;
         break;
       case 'progress':
         if (this.progress.isStopped) {
@@ -135,36 +153,45 @@ export class PuzzlendarService extends WorkerService {
         this.progress.info = data.info ?? this.progress.info;
         break;
       case 'finalSolution':
-        if (this._solutions[data.date] != null) {
-          this.finalizeSolution(data.date);
+        if (this._solutions[data.brd.date] != null) {
+          this.finalizeSolution(data.brd.date);
           this.saveSolution(data);
         }
         this.solve('single');
         break;
       case 'daySolution':
       case 'oneperdaySolution':
-        this.boardDate = data.date;
         if (data.cmd === 'daySolution') {
-          if (this._solutions[data.date] != null) {
-            this.finalizeSolution(data.date);
+          if (this._solutions[data.brd.date] != null) {
+            this.finalizeSolution(data.brd.date);
           }
         }
         this.saveSolution(data);
-        let m = Math.floor(data.date / 100);
-        let d = data.date % 100;
-        d++;
-        if (d === 32) {
-          m++;
-          d = 1;
+        const d = BoardData.decodeDate(data.brd.date);
+        d.d++;
+        if (d.d === 32) {
+          d.m++;
+          d.d = 1;
         }
-        if (m < 13) {
-          this.setDateToBoard(m * 100 + d, data.board);
+        if (d.m === 13) {
+          if (data.brd.type === BoardType.zreptil) {
+            d.w++;
+            if (d.w < 7) {
+              d.m = 1;
+              d.w = 0;
+            }
+          }
+        }
+        if (d.m < 13) {
+          this.setDateToBoard(d.w * 10000 + Math.max(0, d.m) * 100 + Math.max(0, d.d), data.brd);
           this.solve(data.cmd === 'daySolution' ? 'all' : 'oneperday');
+        } else {
+          data.state = State.idle;
         }
         break;
       case 'noSolutionForDay':
         data.state = State.idle;
-        this.msg.info(`Der Teilesatz ${this.partString} ergibt keine Lösung für den ${data.date % 100}.${Math.floor(data.date / 100)}.`);
+        this.msg.info(`Der Teilesatz ${this.partString} ergibt keine Lösung für den ${data.brd.date % 100}.${Math.floor(data.brd.date / 100)}.`);
         break;
     }
     if (data.state != null) {
@@ -175,25 +202,24 @@ export class PuzzlendarService extends WorkerService {
     }
   }
 
-  setDateToBoard(date: number, src: number[][]) {
-    this.boardDate = date;
-    let m = Math.floor(date / 100);
-    let d = date % 100;
-    const mx = (m - 1) % 6;
-    const my = Math.floor((m - 1) / 6);
-    const dx = (d - 1) % 7;
-    const dy = Math.floor((d - 1) / 7) + 2;
-    this.board = src.map((row: number[], y: number) =>
+  setDateToBoard(date: number, src: BoardData) {
+    this.brd.date = date;
+    const d = BoardData.decodeDate(this.brd.date);
+    const wPos = BoardData.weekdays(this.brd.type)[d.w];
+    const mPos = BoardData.months(this.brd.type)[d.m - 1];
+    const dPos = BoardData.days(this.brd.type)[d.d - 1];
+    this.brd.rows = src.rows.map((row: number[], y: number) =>
       row.map((v, x) => {
-        if ((x === dx && y === dy) || (x === mx && y === my)) {
-          return 9;
+        const check = `${x}${y}`;
+        if (check === wPos || check === mPos || check === dPos) {
+          return 99;
         }
-        return v === 9 ? 0 : v;
+        return v === 99 ? 0 : v;
       }));
   }
 
   setBoard() {
-    this.postMessage({cmd: 'setBoard', board: this.board});
+    this.postMessage({cmd: 'setBoard', brd: this.brd});
   }
 
   showSolution(data: any) {
@@ -204,24 +230,24 @@ export class PuzzlendarService extends WorkerService {
     this.msg.info(['Ermittelte Lösung', this.boardString.toUpperCase()])
       .subscribe({
         next: _result => {
-          this.board = data.board;
+          this.brd = data.brd;
           this.saveSolution(data);
           this.state = State.idle;
         }
       });
   }
 
-  clearBoard(board = this.board): void {
-    this.postMessage({cmd: 'clearBoard', board: board});
+  clearBoard(brd = this.brd): void {
+    this.postMessage({cmd: 'clearBoard', brd: brd});
   }
 
-  placeParts(partKeys: string, board = this.board) {
-    this.postMessage({cmd: 'placeParts', board: board, partKeys: partKeys});
+  placeParts(partKeys: string, brd = this.brd) {
+    this.postMessage({cmd: 'placeParts', brd: brd, partKeys: partKeys});
   }
 
   solve(type: string): void {
     if (!this.isValid) {
-      this.msg.info('Es müssen genau zwei Felder ausgewählt sein');
+      this.msg.info('Die Auswahl der Felder ist ungültig');
       return;
     }
     this.progress.init({
@@ -232,14 +258,49 @@ export class PuzzlendarService extends WorkerService {
     });
     this.progress.max = 8!;
     this.progress.value = 0;
-    this.progress.info = `${this.boardDate % 100}.${Math.floor(this.boardDate / 100)}.`;
-    this.progress.text = `Gefundene Lösungen: ${this.solutionsFor(this.boardDate)?.length ?? 0}`;
-    let found = this._solutions[this.boardDate] ?? [];
+    this.progress.showCurrent = true;
+    this.setProgressInfo(this.brd);
+    this.progress.text = `Gefundene Lösungen: ${this.solutionsFor(this.brd.date)?.length ?? 0}`;
+    let found = this._solutions[this.brd.date] ?? [];
     // switch (type) {
     //   case 'single':
     //     found = [this.boardString];
     //     break;
     // }
-    this.postMessage({cmd: `solve-${type}`, board: this.board, alreadyFound: found});
+    this.postMessage({cmd: `solve-${type}`, brd: this.brd, alreadyFound: found});
+  }
+
+  setProgressInfo(board: BoardData) {
+    const date = BoardData.decodeDate(board.date);
+    switch (board.type) {
+      case BoardType.dragonfjord:
+        this.progress.info = `${date.d}.${Math.floor(date.m)}.`;
+        break;
+      case BoardType.zreptil:
+        this.progress.info = `${BoardData.weekdayNameFor(date.w)}, ${date.d}.${Math.floor(date.m)}`;
+        break;
+    }
+  }
+
+  toggleCell(x: number, y: number) {
+    const d = BoardData.decodeDate(this.brd.date);
+    const check = `${x}${y}`;
+    let idx = BoardData.weekdays(this.brd.type).indexOf(check);
+    if (idx >= 0) {
+      d.w = idx;
+    } else {
+      idx = BoardData.months(this.brd.type).indexOf(check);
+      if (idx >= 0) {
+        d.m = idx + 1;
+      } else {
+        idx = BoardData.days(this.brd.type).indexOf(check);
+        if (idx >= 0) {
+          d.d = idx + 1;
+        }
+      }
+    }
+    const date = d.w * 10000 + Math.max(d.m, 1) * 100 + Math.max(d.d, 1);
+    this.setDateToBoard(date, this.brd);
+    this.setBoard();
   }
 }

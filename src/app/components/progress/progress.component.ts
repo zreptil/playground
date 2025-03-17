@@ -6,10 +6,10 @@ import {CommonModule} from '@angular/common';
 import {MaterialModule} from '@/material.module';
 
 @Component({
-    imports: [CommonModule, MaterialModule],
-    selector: 'app-progress',
-    templateUrl: './progress.component.html',
-    styleUrls: ['./progress.component.scss']
+  imports: [CommonModule, MaterialModule],
+  selector: 'app-progress',
+  templateUrl: './progress.component.html',
+  styleUrls: ['./progress.component.scss']
 })
 export class ProgressComponent implements AfterViewInit, OnDestroy {
   @ViewChild('overlay') overlay: any;
@@ -29,6 +29,10 @@ export class ProgressComponent implements AfterViewInit, OnDestroy {
         bufferColor: data.progressBarColor
       });
     });
+  }
+
+  get currentText(): string {
+    return `${this.ps.value.toLocaleString()} / ${this.ps.max.toLocaleString()}`;
   }
 
   get value(): number {

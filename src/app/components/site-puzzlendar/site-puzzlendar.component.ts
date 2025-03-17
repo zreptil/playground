@@ -5,35 +5,21 @@ import {MessageService} from '@/_services/message.service';
 import {ProgressComponent} from '@/components/progress/progress.component';
 import {ProgressService} from '@/_services/progress.service';
 import {DialogResultButton} from '@/_model/dialog-data';
-import {PuzzlendarSolver} from '@/_services/puzzlendar.solver';
 import {Utils} from '@/classes/utils';
 import {MatSlideToggleChange} from '@angular/material/slide-toggle';
+import {BoardData} from '@/_model/board-data';
 
 @Component({
-    selector: 'app-site-puzzlendar',
-    imports: [
-        MaterialModule,
-        ProgressComponent
-    ],
-    templateUrl: './site-puzzlendar.component.html',
-    styleUrl: './site-puzzlendar.component.scss'
+  selector: 'app-site-puzzlendar',
+  imports: [
+    MaterialModule,
+    ProgressComponent
+  ],
+  templateUrl: './site-puzzlendar.component.html',
+  styleUrl: './site-puzzlendar.component.scss'
 })
 export class SitePuzzlendarComponent {
   testDate = 1510;
-
-  content = [
-    ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun'],
-    ['Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'],
-    ['1', '2', '3', '4', '5', '6', '7'],
-    ['8', '9', '10', '11', '12', '13', '14'],
-    ['15', '16', '17', '18', '19', '20', '21'],
-    ['22', '23', '24', '25', '26', '27', '28'],
-    ['29', '30', '31']
-  ];
-
-  worker: Worker;
-
-  srv = new PuzzlendarSolver();
 
   constructor(public ps: PuzzlendarService,
               public msg: MessageService,
@@ -70,7 +56,11 @@ export class SitePuzzlendarComponent {
   get classForBoard(): string[] {
     const ret: string[] = [];
     if (!Utils.isEmpty(this.ps.boardString)) {
-      ret.push('solution');
+      if (this.ps.showImmediate) {
+        ret.push('solutionShow');
+      } else {
+        ret.push('solution');
+      }
     }
     if (!this.ps.partsColored) {
       ret.push('monochrome');
@@ -87,7 +77,7 @@ export class SitePuzzlendarComponent {
   }
 
   get msgSolve(): string {
-    const check = this.ps.solutionsFor(this.ps.boardDate);
+    const check = this.ps.solutionsFor(this.ps.brd.date);
     if (check != null) {
       if (Array.isArray(check)) {
         return `${check.length + 1}. Lösung ermitteln`
@@ -97,7 +87,7 @@ export class SitePuzzlendarComponent {
   }
 
   get msgSolution(): string {
-    const check = this.ps.solutionsFor(this.ps.boardDate, true);
+    const check = this.ps.solutionsFor(this.ps.brd.date, true);
     if (check != null) {
       if (Array.isArray(check)) {
         const idx = check.findIndex((s: string) => s === this.ps.boardString);
@@ -112,37 +102,20 @@ export class SitePuzzlendarComponent {
   }
 
   clickCell(evt: MouseEvent, x: number, y: number) {
-    const firstLine = y < 2 ? 0 : 2;
-    const lastLine = y < 2 ? 1 : 6;
-    let v = this.ps.board[y][x];
+    let v = this.ps.brd.rows[y][x];
     if (v < 0) {
-      this.clickTest(evt, this.ps.boardDate, true)
+      this.clickTest(evt, this.ps.brd.date, true)
       return;
     }
-    if (v === 1119) {
-      v = 0;
-    } else {
-      v = 9;
-      for (let i = firstLine; i <= lastLine; i++) {
-        for (let j = 0; j < 7; j++) {
-          if (this.ps.board[i][j] === 9) {
-            this.ps.board[i][j] = 0;
-            break;
-          }
-        }
-      }
-    }
-    this.ps.board[y][x] = v;
-    this.ps.setBoard();
+    this.ps.toggleCell(x, y);
     this.ps.clearBoard();
   }
 
   clickClear(_evt: MouseEvent) {
-    const d = Math.floor(this.ps.boardDate / 100);
-    const m = this.ps.boardDate % 100;
-    this.msg.confirm($localize`Sollen wirklich alle Lösungen für den ${d}.${m}. gelöscht werden?`).subscribe(result => {
+    const d = BoardData.decodeDate(this.ps.brd.date);
+    this.msg.confirm($localize`Sollen wirklich alle Lösungen für den ${d.d}.${d.m}. gelöscht werden?`).subscribe(result => {
       if (result?.btn === DialogResultButton.yes) {
-        this.ps.setSolutionsFor(this.ps.boardDate, []);
+        this.ps.setSolutionsFor(this.ps.brd.date, []);
       }
     })
   }
@@ -181,6 +154,9 @@ export class SitePuzzlendarComponent {
       this.ps.solverParts.push(key);
     }
     this.ps.setBoard();
+    if (this.ps.showImmediate) {
+      this.clickTest(evt, this.ps.brd?.date, true);
+    }
   }
 
   classForPart(key: string): string[] {
@@ -193,32 +169,34 @@ export class SitePuzzlendarComponent {
 
   cellInfo(x: number, y: number) {
     const ret: string[] = [];
-    if (y > 1 && this.ps.boardDate != null) {
-      const d = Math.floor(this.ps.boardDate / 100) * 100 + (+this.content[y]?.[x]);
-      if (this.ps._solutions[d]?.indexOf('*') >= 0) {
-        ret.push(`${this.ps.solutionsFor(d, this.ps.solverParts?.length > 0).length}`);
+    const idx = BoardData.days(this.ps.brd.type).indexOf(`${x}${y}`);
+    if (idx >= 0) {
+      const d = BoardData.decodeDate(this.ps.brd.date);
+      const key = d.w * 10000 + d.m * 100 + idx + 1;
+      if (this.ps._solutions[key]?.indexOf('*') >= 0) {
+        ret.push(`${this.ps.solutionsFor(key, this.ps.solverParts?.length > 0).length}`);
       }
     }
     return Utils.join(ret, '\n');
   }
 
   cellContent(x: number, y: number) {
-    return this.content[y]?.[x];
+    return BoardData.labelFor(this.ps.brd.type, x, y);
   }
 
   classForSpacer(x: number, y: number, row: boolean): string[] {
     const ret: string[] = [row ? 'row' : 'col'];
-    if (this.ps?.board == null) {
+    if (this.ps?.brd == null) {
       return ret;
     }
-    const check = this.ps.board[y][x];
+    const check = this.ps.brd.rows[y][x];
     if (check < 1 || check > 8) {
       return ret;
     }
-    if (row && x < this.ps.board[y].length - 1 && this.ps.board[y][x + 1] === check) {
+    if (row && x < this.ps.brd.rows[y].length - 1 && this.ps.brd.rows[y][x + 1] === check) {
       ret.push('filled');
       ret.push(`c${check}`);
-    } else if (!row && y < this.ps.board.length - 1 && this.ps.board[y + 1][x] === check) {
+    } else if (!row && y < this.ps.brd.rows.length - 1 && this.ps.brd.rows[y + 1][x] === check) {
       ret.push('filled');
       ret.push(`c${check}`);
     }
@@ -227,21 +205,21 @@ export class SitePuzzlendarComponent {
 
   classForCell(x: number, y: number) {
     const ret: string[] = [];
-    if (this.ps?.board == null) {
+    if (this.ps?.brd == null) {
       return ret;
     }
-    const cell = this.ps.board[y][x];
+    const cell = this.ps.brd.rows[y][x];
     ret.push(`c${cell}`);
-    if (x === 0 || this.ps.board[y][x - 1] !== cell) {
+    if (x === 0 || this.ps.brd.rows[y][x - 1] !== cell) {
       ret.push('left');
     }
-    if (x === this.ps.board[y].length - 1 || this.ps.board[y][x + 1] !== cell) {
+    if (x === this.ps.brd.rows[y].length - 1 || this.ps.brd.rows[y][x + 1] !== cell) {
       ret.push('right');
     }
-    if (y === 0 || this.ps.board[y - 1][x] !== cell) {
+    if (y === 0 || this.ps.brd.rows[y - 1][x] !== cell) {
       ret.push('top');
     }
-    if (y === this.ps.board.length - 1 || this.ps.board[y + 1][x] !== cell) {
+    if (y === this.ps.brd.rows.length - 1 || this.ps.brd.rows[y + 1][x] !== cell) {
       ret.push('bottom');
     }
     return ret;
@@ -249,5 +227,9 @@ export class SitePuzzlendarComponent {
 
   toggleColored(evt: MatSlideToggleChange) {
     this.ps.partsColored = evt.checked;
+  }
+
+  toggleImmediate(evt: MatSlideToggleChange) {
+    this.ps.showImmediate = evt.checked;
   }
 }

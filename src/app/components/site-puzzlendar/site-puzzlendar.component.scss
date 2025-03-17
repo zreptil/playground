@@ -1,5 +1,5 @@
 :host {
-  --size: 30px;
+  --size: 40px;
   --spacing: 2px;
   --frame: #000;
   --c-1: #000;
@@ -11,7 +11,9 @@
   --c6: #080;
   --c7: #f55;
   --c8: #ff0;
-  --c9: #888;
+  --c9: #f0f;
+  --c10: #0ff;
+  --c99: #888;
   --cbw: #aaa;
   --shift: 0.5px;
   display: flex;
@@ -77,8 +79,16 @@ td {
   }
 
   &.c9 [container] {
-    color: white !important;
     background-color: var(--c9);
+  }
+
+  &.c10 [container] {
+    background-color: var(--c10);
+  }
+
+  &.c99 [container] {
+    color: white !important;
+    background-color: var(--c99);
   }
 
   &.c-1 {
@@ -144,9 +154,10 @@ td:last-child {
 
 
 [board].solution:not(:hover),
-[board].monochrome:hover {
+[board].monochrome:hover,
+[board].solutionShow.monochrome {
   table {
-    .c1, .c2, .c3, .c4, .c5, .c6, .c7, .c8 {
+    .c1, .c2, .c3, .c4, .c5, .c6, .c7, .c8, .c9, .c10, .c99 {
       [container] {
         background-color: var(--cbw);
       }
@@ -154,7 +165,8 @@ td:last-child {
   }
 }
 
-[board].solution:hover {
+[board].solution:hover,
+[board].solutionShow {
   [solution] {
     opacity: 0;
   }
@@ -225,4 +237,21 @@ td:last-child {
   flex-flow: row;
   gap: 1em;
   font-size: 0.8em;
+  padding: 1em 0;
 }
+
+div[column] {
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  justify-content: center;
+}
+
+div[row] {
+  display: flex;
+  flex-flow: row;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 1em;
+}
+
