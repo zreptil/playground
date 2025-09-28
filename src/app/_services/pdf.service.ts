@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import { HttpClient, HttpRequest } from '@angular/common/http';
+import {HttpClient, HttpRequest} from '@angular/common/http';
 import {PageData} from '@/_model/page-data';
 import {Log} from '@/_services/log.service';
 import {GLOBALS} from '@/_services/globals.service';
@@ -62,8 +62,9 @@ export class PdfService {
     if (this.pdfMake == null) {
       const pdfMakeModule: any = await import('pdfmake/build/pdfmake');
       const pdfFontsModule: any = await import('pdfmake/build/vfs_fonts');
+      console.log(pdfFontsModule);
       this.pdfMake = pdfMakeModule.default;
-      this.pdfMake.vfs = pdfFontsModule.default.pdfMake.vfs;
+      this.pdfMake.vfs = pdfFontsModule.vfs;
     }
   }
 

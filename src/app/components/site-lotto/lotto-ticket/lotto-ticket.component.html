@@ -1,0 +1,5 @@
+<div grid-container>
+  @for (_ of Array(49); track $index) {
+    <button item [class]="classForItem($index+1)" mat-flat-button (click)="onItemClick($index+1)">{{ $index + 1 }}</button>
+  }
+</div>

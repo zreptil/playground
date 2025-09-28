@@ -37,12 +37,12 @@
   <mat-form-field appearance="fill">
     <mat-label>Natürliche Zahl</mat-label>
     <input formControlName="num" matInput min="1" required type="number">
-    <mat-error *ngIf="form.get('num').hasError('required')">
-      Zahl ist erforderlich.
-    </mat-error>
-    <mat-error *ngIf="form.get('num').hasError('min')">
-      Die Zahl muss positiv sein.
-    </mat-error>
+    @if (form.get('num').hasError('required')) {
+      <mat-error>Zahl ist erforderlich.</mat-error>
+    }
+    @if (form.get('num').hasError('min')) {
+      <mat-error>Die Zahl muss positiv sein.</mat-error>
+    }
   </mat-form-field>
   <button [disabled]="form.invalid" color="primary" mat-raised-button type="submit">
     Berechnen

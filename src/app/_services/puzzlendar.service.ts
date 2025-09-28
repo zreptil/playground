@@ -5,53 +5,102 @@ import {ProgressService} from '@/_services/progress.service';
 import {State, WorkerService} from '@/_services/worker.service';
 import {BoardData, BoardType} from '@/_model/board-data';
 import {PuzzlendarSolver} from '@/_services/puzzlendar.solver';
+import {HttpClient, HttpRequest} from '@angular/common/http';
+import {PartData} from '@/_model/part-data';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PuzzlendarService extends WorkerService {
-  static LS_SOLUTIONS_KEY = 'solutions';
-  static LS_DATE_KEY = 'date';
-  static LS_SOLVERPARTS_KEY = 'solverparts-test';
+  static LS_SOLUTIONS_KEY_DEF = 'solutions';
+  static LS_DATE_KEY_DEF = 'date';
+  static LS_SOLVERPARTS_KEY_DEF = 'solverparts-test';
+  static LS_SOLUTIONS_KEY: string;
+  static LS_DATE_KEY: string;
+  static LS_SOLVERPARTS_KEY: string;
   brd: BoardData;
   boardString: string;
   partString: string;
   solverParts: string[] = [];
   _solutions: { [key: string]: string[] };
-  partsColored = true;
   showImmediate = false;
+  mayChangeSolutions = true;
   srv: PuzzlendarSolver;
+  filterOrientation: number[] = [];
+  showColors: number;
+  afterSetBoard: () => void;
 
-  constructor(public msg: MessageService,
+  constructor(public http: HttpClient,
+              public msg: MessageService,
               public progress: ProgressService) {
     super();
-//    this.brd = new BoardData(BoardType.dragonfjord);
-    this.brd = new BoardData(BoardType.pentomino);
-    this.srv = new PuzzlendarSolver(this.brd);
-    this.partString = this.brd.parts.reduce((a, b) => a + b.key, '');
-    PuzzlendarService.LS_SOLUTIONS_KEY += '-' + this.brd.type + '-' + this.partString;
-    PuzzlendarService.LS_DATE_KEY += '-' + this.brd.type + '-' + this.partString;
-    let temp = JSON.parse(localStorage.getItem(PuzzlendarService.LS_SOLUTIONS_KEY) ?? '{}');
-    this._solutions = {};
-    for (const key of Object.keys(temp)) {
-      if (!Array.isArray(temp[key])) {
-        this._solutions[key] = [temp[key]];
-      } else {
-        this._solutions[key] = temp[key];
-      }
-    }
-    this.setDateToBoard(+(localStorage.getItem(PuzzlendarService.LS_DATE_KEY)), this.brd);
-    temp = localStorage.getItem(PuzzlendarService.LS_SOLVERPARTS_KEY) ?? '';
-    this.solverParts = [];
-    for (let i = 0; i < temp.length; i++) {
-      this.solverParts.push(temp[i]);
-    }
+    this.init();
   }
 
   get isValid(): boolean {
     const count = this.brd.rows.reduce((acc, row) =>
       acc + row.reduce((acc, cell) => acc + (cell >= 0 && cell <= this.brd.parts.length ? 1 : 0), 0), 0);
     return count === this.brd.validCount;
+  }
+
+  loadFromStorage(onDone: (data: any) => void) {
+    const req = new HttpRequest(
+      'GET',
+      `assets/${PuzzlendarService.LS_SOLUTIONS_KEY}.json`,
+      null,
+      {responseType: 'json'});
+    let body: any;
+    this.http.request(req).subscribe({
+      next: (data: any) => {
+        body = data;
+      }, error: (err) => {
+        console.error(err);
+      }, complete: () => {
+        onDone(body.body);
+        this.msg.confirm('Sollen die lokalen Daten überschrieben werden?').subscribe(result => {
+          switch (result.btn) {
+            case 'yes':
+              localStorage.setItem(PuzzlendarService.LS_SOLUTIONS_KEY, JSON.stringify(this._solutions));
+              this.mayChangeSolutions = true;
+              break;
+            default:
+              this.mayChangeSolutions = false;
+              break;
+          }
+        });
+      }
+    });
+  }
+
+  init(loadFromAsset = false) {
+    this.brd = new BoardData(BoardType.zreptil);
+    this.srv = new PuzzlendarSolver(this.brd);
+    this.partString = this.brd.parts.reduce((a, b) => a + b.key, '');
+    PuzzlendarService.LS_SOLUTIONS_KEY = `${PuzzlendarService.LS_SOLUTIONS_KEY_DEF}-${this.brd.type}-${this.partString}`;
+    PuzzlendarService.LS_DATE_KEY = `${PuzzlendarService.LS_DATE_KEY_DEF}-${this.brd.type}-${this.partString}`;
+    PuzzlendarService.LS_SOLVERPARTS_KEY = `${PuzzlendarService.LS_SOLVERPARTS_KEY_DEF}-${this.brd.type}-${this.partString}`;
+    this.initBoard(JSON.parse(localStorage.getItem(PuzzlendarService.LS_SOLUTIONS_KEY) ?? '{}'));
+    this.mayChangeSolutions = true;
+    if (loadFromAsset) {
+      this.loadFromStorage(this.initBoard.bind(this));
+    }
+  }
+
+  initBoard(data: any) {
+    this._solutions = {};
+    for (const key of Object.keys(data)) {
+      if (!Array.isArray(data[key])) {
+        this._solutions[key] = [data[key]];
+      } else {
+        this._solutions[key] = data[key];
+      }
+    }
+    this.setDateToBoard(+(localStorage.getItem(PuzzlendarService.LS_DATE_KEY)), this.brd);
+    data = localStorage.getItem(PuzzlendarService.LS_SOLVERPARTS_KEY) ?? '';
+    this.solverParts = [];
+    for (let i = 0; i < data.length; i++) {
+      this.solverParts.push(data[i]);
+    }
   }
 
   readDateFromBoard() {
@@ -129,10 +178,12 @@ export class PuzzlendarService extends WorkerService {
         this.boardString = data.boardString;
         localStorage.setItem(PuzzlendarService.LS_SOLVERPARTS_KEY, this.solverParts.join(''));
         localStorage.setItem(PuzzlendarService.LS_DATE_KEY, `${data.brd.date}`);
+        this.afterSetBoard?.();
         break;
       case 'solution':
         this.boardString = data.boardString;
         this.saveSolution(data);
+        this.placeParts(this.boardString);
         data.state = State.idle;
         break;
       case 'partialSolution':
@@ -149,7 +200,8 @@ export class PuzzlendarService extends WorkerService {
         }
         this.progress.max = data.max ?? this.progress.max;
         this.progress.value = data.value ?? this.progress.value;
-        this.progress.text = data.text ?? this.progress.text;
+        // this.progress.text = `${data.text ?? this.progress.text} (${this.solutionsFor(data.brd?.date)?.length ?? 0})`;
+        this.progress.text = this.progress.text;
         this.progress.info = data.info ?? this.progress.info;
         break;
       case 'finalSolution':
@@ -174,11 +226,10 @@ export class PuzzlendarService extends WorkerService {
           d.d = 1;
         }
         if (d.m === 13) {
-          if (data.brd.type === BoardType.zreptil) {
+          if (data.brd.type !== BoardType.dragonfjord) {
             d.w++;
             if (d.w < 7) {
               d.m = 1;
-              d.w = 0;
             }
           }
         }
@@ -256,7 +307,7 @@ export class PuzzlendarService extends WorkerService {
       progressBarColor: 'aqua',
       mayCancel: true
     });
-    this.progress.max = 8!;
+    this.progress.max = Utils.factorial(this.brd.parts.length);
     this.progress.value = 0;
     this.progress.showCurrent = true;
     this.setProgressInfo(this.brd);
@@ -276,6 +327,7 @@ export class PuzzlendarService extends WorkerService {
       case BoardType.dragonfjord:
         this.progress.info = `${date.d}.${Math.floor(date.m)}.`;
         break;
+      case BoardType.pentomino:
       case BoardType.zreptil:
         this.progress.info = `${BoardData.weekdayNameFor(date.w)}, ${date.d}.${Math.floor(date.m)}`;
         break;
@@ -302,5 +354,20 @@ export class PuzzlendarService extends WorkerService {
     const date = d.w * 10000 + Math.max(d.m, 1) * 100 + Math.max(d.d, 1);
     this.setDateToBoard(date, this.brd);
     this.setBoard();
+  }
+
+  isPartSymmetric(part: PartData) {
+    return part.skipMod.length > 0 && part.skipMod?.every(x => {
+      return [4, 5, 6, 7].indexOf(x) >= 0;
+    });
+  }
+
+  copySolutionToClipboard() {
+    try {
+      const text = JSON.stringify(this._solutions, null, ' ');
+      navigator.clipboard.writeText(text);
+    } catch (err) {
+      console.error('Fehler beim Kopieren:', err);
+    }
   }
 }

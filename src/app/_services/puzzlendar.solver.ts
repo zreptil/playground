@@ -1,6 +1,39 @@
 import {PartData, Point} from '@/_model/part-data';
 import {BoardData} from '@/_model/board-data';
 
+function* permutationen(str: string): Generator<string> {
+  const arr = str.split('');
+  const n = arr.length;
+
+  function* permutiere(a: string[], n: number): Generator<string[]> {
+    if (n <= 1) {
+      yield a.slice();
+    } else {
+      for (let i = 0; i < n; i++) {
+        yield* permutiere(a, n - 1);
+        const j = n % 2 === 0 ? i : 0;
+        [a[n - 1], a[j]] = [a[j], a[n - 1]];
+      }
+    }
+  }
+
+  for (const perm of permutiere(arr, n)) {
+    yield perm.join('');
+  }
+}
+
+class TryData {
+  max: number;
+  last: number;
+  idx: number;
+  src: string;
+  b: number[][];
+  single: string;
+  type: string;
+  alreadyFound: string[];
+  startAt: string;
+}
+
 export class PartManager {
   setCurrPos(part: PartData, value: Point) {
     part.currPos = value;
@@ -88,7 +121,6 @@ export class PartManager {
 }
 
 export class PuzzlendarSolver {
-  static _permutate: string[];
   pm = new PartManager();
 
   constructor(public board: BoardData) {
@@ -143,25 +175,6 @@ export class PuzzlendarSolver {
     }
   }
 
-  permutate(str: string): string[] {
-    if (str.length <= 1) {
-      return [str];
-    }
-
-    const ret: string[] = [];
-
-    for (let i = 0; i < str.length; i++) {
-      const c = str[i];
-      const rest = str.slice(0, i) + str.slice(i + 1);
-      const restPermutationen = this.permutate(rest);
-
-      for (const perm of restPermutationen) {
-        ret.push(c + perm);
-      }
-    }
-    return ret;
-  }
-
   solve(alreadyFound: string[], single: string, type: string): boolean {
     if (!this.isValid) {
       return false;
@@ -173,69 +186,137 @@ export class PuzzlendarSolver {
   findSolution(alreadyFound: string[], single: string, type: string) {
     this.clearBoard();
     let perms = [single];
-    if (single == null) {
-      if (PuzzlendarSolver._permutate == null) {
-        PuzzlendarSolver._permutate = this.permutate(this.parts.map(p => p.key).join(''));
-      }
-      perms = PuzzlendarSolver._permutate;
-    }
-    let idx = 0;
-    let b: number[][] = null;
     alreadyFound ??= [];
-    let lastProgress = 0;
     if (type === 'solve-oneperday' && alreadyFound.length > 0) {
       postMessage({cmd: 'oneperdaySolution', ...this.boardData});
       return;
     }
-    if (alreadyFound.indexOf('*') < 0) {
-      for (const src of perms) {
-        if (single != null || alreadyFound.indexOf(src) < 0) {
-          lastProgress++;
-          if (lastProgress > 1000) {
-            lastProgress = 0;
-//            postMessage({cmd: 'progress', max: perms.length, value: idx});
-            postMessage({cmd: 'progress', max: perms.length, value: idx});
-          }
-          if (this.placeParts(src)) {
-            if (type === 'solve-day' || type === 'solve-all') {
-              if (b == null) {
-                b = this.board.rows.map(row => row.map(f => f));
-              }
-              lastProgress = 0;
-              postMessage({cmd: 'partialSolution', ...this.boardData});
-            } else if (type === 'solve-oneperday') {
-              lastProgress = 0;
-              postMessage({cmd: 'oneperdaySolution', ...this.boardData});
-              return;
-            } else {
-              lastProgress = 0;
-              postMessage({cmd: 'solution', ...this.boardData});
-              return;
-            }
-          }
+    if (true || single == null) {
+      const src = this.parts.map(p => p.key).join('');
+      const max = Array.from({length: src.length}, (_, i) => i + 1)
+        .reduce((acc, val) => acc * val, 1);
+      const data: TryData = {
+        idx: 0,
+        last: 0,
+        max: max,
+        src: src,
+        type: type,
+        b: null,
+        single: single,
+        alreadyFound: alreadyFound,
+        startAt: alreadyFound?.[alreadyFound?.length - 1]
+      }
+      for (const p of permutationen(data.src)) {
+        if (!this.trySolution(p, data)) {
+          return;
         }
-        idx++;
+      }
+      switch (type) {
+        case 'solve-single':
+          postMessage({cmd: 'solution', ...this.boardData});
+          break;
+        case 'solve-day':
+          if (data.b != null) {
+            this.board.rows = data.b;
+          }
+          postMessage({cmd: 'finalSolution', ...this.boardData});
+          break;
+        case 'solve-all':
+          postMessage({cmd: 'daySolution', ...this.boardData});
+          break;
+        case 'solve-oneperday':
+          postMessage({cmd: 'noSolutionForDay', ...this.boardData});
+          break;
+      }
+      return;
+    }
+    // let idx = 0;
+    // let b: number[][] = null;
+    // let lastProgress = 0;
+    // if (alreadyFound.indexOf('*') < 0) {
+    //   for (const src of perms) {
+    //     if (single != null || alreadyFound.indexOf(src) < 0) {
+    //       lastProgress++;
+    //       if (lastProgress > 1000) {
+    //         lastProgress = 0;
+    //         postMessage({cmd: 'progress', max: perms.length, value: idx});
+    //       }
+    //       if (this.placeParts(src)) {
+    //         if (type === 'solve-day' || type === 'solve-all') {
+    //           if (b == null) {
+    //             b = this.board.rows.map(row => row.map(f => f));
+    //           }
+    //           lastProgress = 0;
+    //           postMessage({cmd: 'partialSolution', ...this.boardData});
+    //         } else if (type === 'solve-oneperday') {
+    //           lastProgress = 0;
+    //           postMessage({cmd: 'oneperdaySolution', ...this.boardData});
+    //           return;
+    //         } else {
+    //           lastProgress = 0;
+    //           postMessage({cmd: 'solution', ...this.boardData});
+    //           return;
+    //         }
+    //       }
+    //     }
+    //     idx++;
+    //   }
+    // }
+    //
+    // switch (type) {
+    //   case 'solve-single':
+    //     postMessage({cmd: 'solution', ...this.boardData});
+    //     break;
+    //   case 'solve-day':
+    //     if (b != null) {
+    //       this.board.rows = b;
+    //     }
+    //     postMessage({cmd: 'finalSolution', ...this.boardData});
+    //     break;
+    //   case 'solve-all':
+    //     postMessage({cmd: 'daySolution', ...this.boardData});
+    //     break;
+    //   case 'solve-oneperday':
+    //     lastProgress = 0;
+    //     postMessage({cmd: 'noSolutionForDay', ...this.boardData});
+    //     break;
+    // }
+  }
+
+  trySolution(src: string, data: TryData): boolean {
+    if (data.startAt != null) {
+      if (data.startAt === src) {
+        data.startAt = null;
+      }
+      data.idx++;
+      return true;
+    }
+    if (data.single != null || data.alreadyFound.indexOf(src) < 0) {
+      data.last++;
+      if (data.last > 1000) {
+        data.last = 0;
+        postMessage({cmd: 'progress', max: data.max, value: data.idx, text: src});
+      }
+      if (this.placeParts(src)) {
+        if (data.type === 'solve-day' || data.type === 'solve-all') {
+          if (data.b == null) {
+            data.b = this.board.rows.map(row => row.map(f => f));
+          }
+          data.last = 0;
+          postMessage({cmd: 'partialSolution', ...this.boardData});
+        } else if (data.type === 'solve-oneperday') {
+          data.last = 0;
+          postMessage({cmd: 'oneperdaySolution', ...this.boardData});
+          return false;
+        } else {
+          data.last = 0;
+          postMessage({cmd: 'solution', ...this.boardData});
+          return false;
+        }
       }
     }
-
-    switch (type) {
-      case 'solve-single':
-        postMessage({cmd: 'solution', ...this.boardData});
-        break;
-      case 'solve-day':
-        if (b != null) {
-          this.board.rows = b;
-        }
-        postMessage({cmd: 'finalSolution', ...this.boardData});
-        break;
-      case 'solve-all':
-        postMessage({cmd: 'daySolution', ...this.boardData});
-        break;
-      case 'solve-oneperday':
-        lastProgress = 0;
-        postMessage({cmd: 'noSolutionForDay', ...this.boardData});
-        break;
-    }
+    data.idx++;
+    return true;
   }
 
   nextFreeField(pt: Point, brd: BoardData): Point {
@@ -392,6 +473,7 @@ export class PuzzlendarSolver {
   }
 
   debugPart(part: PartData) {
+    return;
     const area: any[] = [];
     for (let y = 0; y < this.board.rows.length; y++) {
       const row = [];

@@ -1,0 +1,20 @@
+<div tickets>
+  @for (_ of scheine; track $index) {
+    <app-lotto-ticket [(numbers)]="scheine[$index]"></app-lotto-ticket>
+  }
+</div>
+<div info>
+  <app-datepicker [(period)]="period" [showLabel]="true" msgPeriod="Seit"></app-datepicker>
+  <div grid-container>
+    <div></div>
+    @for (title of listTitle; track $index) {
+      <div item title>{{ title }}</div>
+    }
+    @for (row of listRows; track $index; let y = $index) {
+      <div title>{{ row.title }}</div>
+      @for (day of [-1, 3, 6]; track $index) {
+        <div item data>{{ row.count(y, day) }}</div>
+      }
+    }
+  </div>
+</div>

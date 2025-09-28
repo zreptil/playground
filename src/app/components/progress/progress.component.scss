@@ -1,6 +1,6 @@
 [overlay] {
-  --mdc-linear-progress-track-height: 25px;
-  --mdc-linear-progress-active-indicator-height: var(--mdc-linear-progress-track-height);
+  --mat-progress-bar-track-height: 25px;
+  --mat-progress-bar-active-indicator-height: var(--mat-progress-bar-track-height);
   position: absolute;
   left: 0;
   top: 0;
@@ -37,9 +37,11 @@
     width: 100%;
 
     mat-progress-bar {
+      --mat-progress-bar-active-indicator-color: rgba(255, 255, 255, 0.4);
       width: 100%;
-      height: var(--mdc-linear-progress-track-height);
+      height: var(--mat-progress-bar-track-height);
       border-radius: 10px;
+      color: white;
     }
 
     [current] {
@@ -53,7 +55,7 @@
 
   button {
     position: absolute;
-    bottom: 5px;
+    bottom: -5px;
   }
 
   ::ng-deep .mat-progress-bar-buffer {
@@ -61,7 +63,7 @@
   }
 
   ::ng-deep .mat-progress-bar-fill::after {
-    background-color: rgba(255, 255, 255, 0.6);
+    background-color: rgba(255, 255, 255, 0.9);
   }
 
   [label] {

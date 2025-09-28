@@ -1,0 +1,31 @@
+[grid-container] {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+  grid-auto-rows: auto;
+  gap: 5px;
+  padding: 5px;
+
+  [item] {
+    display: flex;
+    padding: 2px;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.6em;
+    line-height: 0.7em;
+    min-width: 32px;
+    --mat-button-filled-container-height: 32px;
+
+    &.current {
+      background-color: rgba(255, 255, 255, 0.6);
+      color: black;
+      font-weight: bold;
+      font-size: 1em;
+    }
+  }
+
+  [data] {
+    display: flex;
+    justify-content: flex-end;
+  }
+}
+

@@ -312,13 +312,13 @@
 }
 
 .mat-mdc-slider.mat-primary {
-  --mdc-slider-handle-color: var(--mainFore);
-  --mdc-slider-focus-handle-color: var(--mainFore);
-  --mdc-slider-hover-handle-color: var(--mainFore);
-  --mdc-slider-active-track-color: var(--mainFore);
-  --mdc-slider-inactive-track-color: var(--mainFore);
-  --mdc-slider-with-tick-marks-active-container-color: #fff;
-  --mdc-slider-with-tick-marks-inactive-container-color: var(--mainFore);
+  --mat-slider-handle-color: var(--mainFore);
+  --mat-slider-focus-handle-color: var(--mainFore);
+  --mat-slider-hover-handle-color: var(--mainFore);
+  --mat-slider-active-track-color: var(--mainFore);
+  --mat-slider-inactive-track-color: var(--mainFore);
+  --mat-slider-with-tick-marks-active-container-color: #fff;
+  --mat-slider-with-tick-marks-inactive-container-color: var(--mainFore);
   --mat-mdc-slider-ripple-color: var(--mainFore);
   --mat-mdc-slider-hover-ripple-color: rgba(63, 81, 181, 0.05);
   --mat-mdc-slider-focus-ripple-color: rgba(63, 81, 181, 0.2);

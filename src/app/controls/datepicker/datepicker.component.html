@@ -1,0 +1,9 @@
+@if (showLabel) {
+  <div class="floating">{{ periodFloatingLabel }}</div>
+}
+<button (click)="showDatePicker()" [class]="classForButton" mat-raised-button>
+  <div main>{{ periodLabelMain }}</div>
+  @if (data.period.dowActiveText != '') {
+    <div sub>{{ periodLabelSub }}</div>
+  }
+</button>

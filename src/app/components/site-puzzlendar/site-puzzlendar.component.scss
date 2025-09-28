@@ -2,6 +2,7 @@
   --size: 40px;
   --spacing: 2px;
   --frame: #000;
+  --shadow: black;
   --c-1: #000;
   --c1: #88f;
   --c2: #f00;
@@ -15,6 +16,10 @@
   --c10: #0ff;
   --c99: #888;
   --cbw: #aaa;
+  --cmb: #ccf;
+  --cmf: rgba(0, 0, 0, 0.8);
+  --cf: silver;
+  --cb: gold;
   --shift: 0.5px;
   display: flex;
   flex-flow: column;
@@ -157,9 +162,42 @@ td:last-child {
 [board].monochrome:hover,
 [board].solutionShow.monochrome {
   table {
-    .c1, .c2, .c3, .c4, .c5, .c6, .c7, .c8, .c9, .c10, .c99 {
+    .c1, .c2, .c3, .c4, .c5, .c6, .c7, .c8, .c9, .c10 {
       [container] {
         background-color: var(--cbw);
+      }
+    }
+
+    .c99 {
+      [container] {
+        background-color: var(--cmb);
+        color: var(--cmf) !important;
+      }
+    }
+  }
+}
+
+[board].solutionShow.frontback {
+  table {
+    .c1, .c2, .c3, .c4, .c5, .c6, .c7, .c8, .c9, .c10 {
+      [container] {
+        background-color: var(--cf);
+      }
+    }
+
+    .animate {
+      [container] {
+        animation-name: background-color-cycle;
+        animation-duration: 2s;
+        animation-iteration-count: infinite;
+        animation-direction: alternate;
+        animation-timing-function: ease-in-out;
+      }
+    }
+
+    .back {
+      [container] {
+        background-color: var(--cb);
       }
     }
   }
@@ -214,6 +252,7 @@ td:last-child {
     width: 100%;
     height: 100%;
     color: white;
+    text-shadow: 3px 2px 3px var(--shadow);
     font-size: 2em;
     font-weight: bold;
     pointer-events: none;
@@ -255,3 +294,43 @@ div[row] {
   gap: 1em;
 }
 
+[nochange] {
+  font-size: 0.75em;
+  opacity: 0.7;
+  max-width: 20em;
+}
+
+[switches] {
+  display: flex;
+  flex-flow: column;
+  gap: 0.5em;
+  align-items: flex-start;
+}
+
+mat-button-toggle-group {
+  --mat-button-toggle-divider-color: rgba(0, 0, 0, 0.2);
+
+  mat-button-toggle {
+    --mat-button-toggle-height: 24px;
+    --mat-button-toggle-selected-state-background-color: rgba(255, 255, 255, 0.6);
+    --mat-button-toggle-background-color: rgba(255, 255, 255, 0.3);
+
+    font-size: 0.75em;
+  }
+}
+
+.orient0 {
+  background-color: var(--cf);
+
+  &.mat-button-toggle-appearance-standard.mat-button-toggle-checked {
+    background-color: var(--cf);
+  }
+}
+
+.orient1 {
+  background-color: var(--cb);
+
+  &.mat-button-toggle-appearance-standard.mat-button-toggle-checked {
+    background-color: var(--cb);
+  }
+}

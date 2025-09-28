@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {Utils} from '@/classes/utils';
 import {Log} from '@/_services/log.service';
-import { HttpClient, HttpRequest } from '@angular/common/http';
+import {HttpClient, HttpRequest} from '@angular/common/http';
 import {lastValueFrom, throwError, timeout} from 'rxjs';
 import {oauth2SyncType} from '@/_services/sync/oauth2pkce';
 import {SyncService} from '@/_services/sync/sync.service';
@@ -14,6 +14,8 @@ import {WelcomeComponent} from '@/components/welcome/welcome.component';
 import {WhatsNewComponent} from '@/components/whats-new/whats-new.component';
 import {FormConfig} from '@/forms/form-config';
 import {DomSanitizer} from '@angular/platform-browser';
+import {PeriodShift} from '@/_model/period-shift';
+import {DatepickerPeriod} from '@/_model/datepicker-period';
 
 class CustomTimeoutError extends Error {
   constructor() {
@@ -42,12 +44,15 @@ export class GlobalsService {
   oauth2AccessToken: string = null;
   listConfig: FormConfig[] = [];
   listConfigOrg: FormConfig[] = [];
+  currPeriodShift: PeriodShift;
+  period: DatepickerPeriod = new DatepickerPeriod();
   sites = [
     {id: 'rubik'},
     {id: 'thumb'},
     {id: 'prime'},
     {id: 'pdf'},
     {id: 'collatz'},
+    {id: 'lotto'},
     {id: 'puzzlendar'}
   ];
   dragPos: any = {};
@@ -66,7 +71,9 @@ export class GlobalsService {
     rubikTurnSpeed: 0.2,
     rubikRecorded: '',
     pdfTarget: '',
-    pdfData: null
+    pdfData: null,
+    formConfig: null,
+    lottoDate: 20130101
   }
   formListParams: any;
   private flags = '';
@@ -309,6 +316,7 @@ export class GlobalsService {
       for (const key of Object.keys(this.siteConfig)) {
         temp[key] = storage.s3[key] ?? (this.siteConfig as any)[key];
       }
+      temp.formConfig = this.listConfig.map(cfg => cfg.asJson);
       this.siteConfig = temp;
     }
     this.formListParams = storage.s4;

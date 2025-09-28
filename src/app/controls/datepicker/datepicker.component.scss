@@ -1,0 +1,26 @@
+:host {
+}
+
+button.dpBtn.empty {
+  background-color: var(--datepickerBtnEmptyBack);
+  color: var(--datepickerBtnEmptyFore);
+}
+
+button.dpBtn {
+  height: 4em;
+
+  ::ng-deep .mat-button-wrapper {
+    display: flex;
+    line-height: initial;
+    gap: 0.5em;
+    flex-direction: column;
+  }
+
+  div[main] {
+  }
+
+  div[sub] {
+    font-size: 75%;
+  }
+}
+

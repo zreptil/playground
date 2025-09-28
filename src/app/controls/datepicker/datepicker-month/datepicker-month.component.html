@@ -1,0 +1,42 @@
+<div class="title">{{ monthName(date) }} {{ date?.getFullYear() }}</div>
+<div class="weektitle">
+  @for (dow of month?.weeks[0].days; track $index) {
+    <button (click)="weekdayClicked(dow)"
+            class="btn" i18n-title="title for button of weekdayname"
+            mat-button
+            title="Als ersten Tag der Woche festlegen">
+      {{ dow.shortName }}
+    </button>
+  }
+</div>
+<div class="month mat-elevation-z10">
+  @for (week of month?.weeks; track $index) {
+    <div class="week">
+      @for (day of week.days; track $index) {
+        @if (!day.isRaised) {
+          <button (click)="dayClicked(day)"
+                  [class]="dayclass(day)"
+                  [disabled]="!day.isEnabled"
+                  mat-button>{{ day.day }}
+          </button>
+        }
+        @if (day.isRaised) {
+          <button (click)="dayClicked(day)"
+                  [class]="dayclass(day)"
+                  [disabled]="!day.isEnabled"
+                  mat-raised-button>{{ day.day }}
+          </button>
+        }
+      }
+    </div>
+  }
+  <div class="weekmarks">
+    @for (dow of month?.weeks[0].days; track $index) {
+      <button (click)="period.activateDow(weekday(dow.date), !period.isDowActive(weekday(dow.date)))"
+              [class]="dowmark(weekday(dow.date))"
+              mat-button>
+        <mat-icon>{{ period.isDowActive(weekday(dow.date)) ? 'done' : 'close' }}</mat-icon>
+      </button>
+    }
+  </div>
+</div>

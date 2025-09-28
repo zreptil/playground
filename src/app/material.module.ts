@@ -27,7 +27,6 @@ import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {MatTreeModule} from '@angular/material/tree';
 import {MatFormFieldModule} from '@angular/material/form-field';
-import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import {MatStepper, MatStepperModule} from '@angular/material/stepper';
 import {CdkStepperModule, STEPPER_GLOBAL_OPTIONS} from '@angular/cdk/stepper';
@@ -84,7 +83,6 @@ import {ClipboardModule} from '@angular/cdk/clipboard';
     PortalModule,
     ScrollingModule,
     MatDialogModule,
-    BrowserAnimationsModule,
     ClipboardModule
   ],
   providers: [MatStepper, {

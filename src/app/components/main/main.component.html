@@ -1,13 +1,14 @@
 <div mainpanel>
   <div toolbar>
     <div>
-      <button (click)="globals.appSite=site.id"
-              *ngFor="let site of globals.sites"
-              [class]="site.id === globals.appSite ? 'current': ''"
-              btn-site
-              mat-button>
-        <img alt="appicon" class="appicon" src="../../../assets/images/site-{{site.id}}.png">
-      </button>
+      @for (site of globals.sites; track $index) {
+        <button (click)="globals.appSite=site.id"
+                [class]="site.id === globals.appSite ? 'current': ''"
+                btn-site
+                mat-button>
+          <img alt="appicon" class="appicon" src="../../../assets/images/site-{{site.id}}.png">
+        </button>
+      }
     </div>
     <div>
       <button [matMenuTriggerFor]="menu" mat-button>
@@ -66,6 +67,9 @@
       }
       @case ('puzzlendar') {
         <app-site-puzzlendar></app-site-puzzlendar>
+      }
+      @case ('lotto') {
+        <app-site-lotto></app-site-lotto>
       }
     }
   </div>

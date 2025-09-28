@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {AfterViewInit, Component, OnDestroy} from '@angular/core';
 import {MaterialModule} from '@/material.module';
 import {PuzzlendarService} from '@/_services/puzzlendar.service';
 import {MessageService} from '@/_services/message.service';
@@ -8,23 +8,37 @@ import {DialogResultButton} from '@/_model/dialog-data';
 import {Utils} from '@/classes/utils';
 import {MatSlideToggleChange} from '@angular/material/slide-toggle';
 import {BoardData} from '@/_model/board-data';
+import {FormsModule} from '@angular/forms';
 
 @Component({
   selector: 'app-site-puzzlendar',
   imports: [
     MaterialModule,
-    ProgressComponent
+    ProgressComponent,
+    FormsModule
   ],
   templateUrl: './site-puzzlendar.component.html',
   styleUrl: './site-puzzlendar.component.scss'
 })
-export class SitePuzzlendarComponent {
+export class SitePuzzlendarComponent implements AfterViewInit, OnDestroy {
   testDate = 1510;
+  orientList = [
+    {label: 'Vorderseite', value: 0},
+    {label: 'Rückseite', value: 1}
+  ];
+  colorList = [
+    {label: 'Einfarbig', value: 0},
+    {label: 'Bunt', value: 1},
+    {label: 'Vorder/Rückseite', value: 2},
+  ]
+  animationSync: any;
 
   constructor(public ps: PuzzlendarService,
               public msg: MessageService,
               public progress: ProgressService) {
     setTimeout(() => this.clickTest(null, this.testDate));
+    ps.filterOrientation = this.orientList.map(e => e.value);
+    ps.showColors = 1;
   }
 
   get maxSolutions(): string {
@@ -32,7 +46,7 @@ export class SitePuzzlendarComponent {
     let key: string;
     const v = keys.reduce((a, b) => {
       if (a < this.ps.solutionsFor(+b, true).length) {
-        key = `${+b % 100}.${Math.floor(+b / 100)}`;
+        key = this.solutionString(+b);
         return this.ps.solutionsFor(+b, true).length;
       }
       return a;
@@ -45,7 +59,7 @@ export class SitePuzzlendarComponent {
     let key: string;
     const v = keys.reduce((a, b) => {
       if (a > this.ps.solutionsFor(+b, true).length) {
-        key = `${+b % 100}.${Math.floor(+b / 100)}`;
+        key = this.solutionString(+b);
         return this.ps.solutionsFor(+b, true).length;
       }
       return a;
@@ -62,8 +76,13 @@ export class SitePuzzlendarComponent {
         ret.push('solution');
       }
     }
-    if (!this.ps.partsColored) {
-      ret.push('monochrome');
+    switch (this.ps.showColors) {
+      case 0:
+        ret.push('monochrome');
+        break;
+      case 2:
+        ret.push('frontback');
+        break;
     }
     return ret;
   }
@@ -101,14 +120,45 @@ export class SitePuzzlendarComponent {
     return 'Lösung';
   }
 
+  get hasSolutions() {
+    return this.ps.solutionsFor(this.ps.brd?.date).length > 0;
+  }
+
+  get hasStar() {
+    return (this.ps._solutions[this.ps?.brd?.date] ?? [])?.indexOf('*') >= 0;
+  }
+
+  ngOnDestroy() {
+    this.animationSync?.free(); // optional: Synchronisation beenden
+  }
+
+  ngAfterViewInit() {
+  }
+
+  onOrientChange(evt: any) {
+    if (this.ps.filterOrientation.length === 0) {
+      this.ps.filterOrientation = [evt.source.value];
+    }
+  }
+
+  solutionString(key: number): string {
+    const wd = BoardData.weekdayNameFor(Math.floor(+key / 10000));
+    const d = Math.floor((+key % 10000) / 100);
+    const m = +key % 100;
+    return `${wd}-${m}.${d}`;
+  }
+
   clickCell(evt: MouseEvent, x: number, y: number) {
     let v = this.ps.brd.rows[y][x];
     if (v < 0) {
-      this.clickTest(evt, this.ps.brd.date, true)
+      this.clickTest(evt, this.ps.brd.date, true);
       return;
     }
     this.ps.toggleCell(x, y);
     this.ps.clearBoard();
+    if (this.ps.showImmediate) {
+      this.clickTest(evt, this.ps.brd.date, true);
+    }
   }
 
   clickClear(_evt: MouseEvent) {
@@ -121,10 +171,22 @@ export class SitePuzzlendarComponent {
   }
 
   clickSolve(_evt: MouseEvent, type: string) {
+    this.ps.solverParts = [];
     this.ps.solve(type);
   }
 
   clickTest(_evt: MouseEvent, value: number | string, filterParts = false) {
+    const save = this.ps.showColors;
+    if (this.ps.filterOrientation.length === 2) {
+      this.ps.showColors = 0;
+    }
+    setTimeout(() => {
+      this.setParts(this.ps.boardString, value, filterParts);
+      this.ps.showColors = save;
+    });
+  }
+
+  setParts(lastBoard: string, value: number | string, filterParts: boolean) {
     let ret: string;
     if (typeof value === 'string') {
       ret = value;
@@ -142,6 +204,38 @@ export class SitePuzzlendarComponent {
       }
     }
     if (ret != null) {
+      if (this.ps.filterOrientation.length === 1) {
+        this.ps.afterSetBoard = () => {
+          if (this.ps.boardString !== lastBoard) {
+            this.ps.afterSetBoard = null;
+            let tryNext = false;
+            this.ps.brd.parts.forEach((part) => {
+              if (!this.ps.isPartSymmetric(part)) {
+                switch (this.ps.filterOrientation[0]) {
+                  case 0:
+                    if (part.mod >= 4) {
+                      tryNext = true;
+                    }
+                    break;
+                  case 1:
+                    if (part.mod < 4) {
+                      tryNext = true;
+                    }
+                    break;
+                }
+              }
+            });
+            if (tryNext) {
+              if (lastBoard == null) {
+                lastBoard = this.ps.boardString;
+              }
+              this.setParts(lastBoard, value, filterParts);
+            }
+          } else {
+            this.msg.info(`Es gibt keine Lösung, bei der nur die ${this.orientList[this.ps.filterOrientation[0]].label} der Teile zu sehen ist`);
+          }
+        };
+      }
       this.ps.placeParts(ret);
     }
   }
@@ -173,8 +267,9 @@ export class SitePuzzlendarComponent {
     if (idx >= 0) {
       const d = BoardData.decodeDate(this.ps.brd.date);
       const key = d.w * 10000 + d.m * 100 + idx + 1;
-      if (this.ps._solutions[key]?.indexOf('*') >= 0) {
-        ret.push(`${this.ps.solutionsFor(key, this.ps.solverParts?.length > 0).length}`);
+      const count = this.ps.solutionsFor(key, this.ps.solverParts?.length > 0).length;
+      if (count > 0) {
+        ret.push(`${count}${this.ps._solutions[key]?.indexOf('*') >= 0 ? '*' : ''}`);
       }
     }
     return Utils.join(ret, '\n');
@@ -209,6 +304,25 @@ export class SitePuzzlendarComponent {
       return ret;
     }
     const cell = this.ps.brd.rows[y][x];
+    if (cell > 0) {
+      const part = this.ps.brd.parts[cell - 1];
+      if (part != null) {
+        if (part.mod >= 4) {
+          ret.push('back');
+        }
+        if (this.ps.isPartSymmetric(part)) {
+          if (this.ps.filterOrientation.length === 2) {
+            ret.push('animate');
+          } else {
+            switch (this.ps.filterOrientation?.[0]) {
+              case 1:
+                ret.push('back');
+                break;
+            }
+          }
+        }
+      }
+    }
     ret.push(`c${cell}`);
     if (x === 0 || this.ps.brd.rows[y][x - 1] !== cell) {
       ret.push('left');
@@ -225,11 +339,15 @@ export class SitePuzzlendarComponent {
     return ret;
   }
 
-  toggleColored(evt: MatSlideToggleChange) {
-    this.ps.partsColored = evt.checked;
-  }
-
   toggleImmediate(evt: MatSlideToggleChange) {
     this.ps.showImmediate = evt.checked;
+  }
+
+  toggleAssetLoad(evt: MatSlideToggleChange) {
+    this.ps.init(evt.checked);
+  }
+
+  classForOrient(orient: any) {
+    return `orient${orient.value}`;
   }
 }

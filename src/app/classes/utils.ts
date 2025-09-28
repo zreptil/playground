@@ -4,6 +4,10 @@ export class Utils {
   static fullDate = $localize`dd/MM/yyyy, hh:mm:ss`;
   private static _uniqueId = 0;
 
+  static get now(): Date {
+    return new Date();
+  }
+
   static replace(text: string, src: string | string[], dst: string | string[]): string {
     if (!Array.isArray(src) && !Array.isArray(dst)) {
       src = [src];
@@ -130,8 +134,28 @@ export class Utils {
       const m = parseInt(value.substring(4, 6)) - 1;
       const d = parseInt(value.substring(6, 8));
       ret = new Date(y, m, d);
+    } else if (value.length === 10) {
+      const d = parseInt(value.substring(0, 2));
+      const m = parseInt(value.substring(3, 5)) - 1;
+      const y = parseInt(value.substring(6, 10));
+      ret = new Date(y, m, d);
     }
 
+    return ret;
+  }
+
+  static getDate(value: number): Date {
+    if (value == null) {
+      return null;
+    }
+    const src = `${value}`.padStart(8, '0');
+    let ret: Date = null;
+    if (src.length === 8) {
+      const year = +src.substring(0, 4);
+      const month = +src.substring(4, 6);
+      const day = +src.substring(6, 8);
+      ret = new Date(year, month - 1, day);
+    }
     return ret;
   }
 
@@ -449,5 +473,10 @@ export class Utils {
       value -= (max - min);
     }
     return value;
+  }
+
+  static factorial(value: number) {
+    return Array.from({length: value}, (_, i) => i + 1)
+      .reduce((acc, val) => acc * val, 1);
   }
 }
