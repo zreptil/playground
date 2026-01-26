@@ -92,7 +92,7 @@ export class DatepickerPeriod {
   }
 
   get display(): string {
-    let ret = `${Utils.fmtDate(this.start)} - ${Utils.fmtDate(this.end)}`;
+    let ret = `${Utils.fmtDate(this.start, 'dd.MM.yyyy')} - ${Utils.fmtDate(this.end, 'dd.MM.yyyy')}`;
     if (this.entryKey != null) {
       ret = this.entryTitle;
     }

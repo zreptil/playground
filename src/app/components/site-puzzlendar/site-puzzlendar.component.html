@@ -22,7 +22,7 @@
     </div>
     <div>
       @for (part of ps.srv.board.parts; track $index) {
-        <button (click)="clickPart($event, part.key)" mat-button part [class]="classForPart(part.key)">
+        <button (click)="clickPart($event, part.key)" [class]="classForPart(part.key)" mat-button part>
           {{ part.key }}
         </button>
       }
@@ -73,7 +73,7 @@
       <div>Orientierungsfilter</div>
       <mat-button-toggle-group (change)="onOrientChange($event)" [(ngModel)]="ps.filterOrientation" multiple>
         @for (option of orientList; track $index) {
-          <mat-button-toggle [value]="option.value" [class]="classForOrient(option)">
+          <mat-button-toggle [class]="classForOrient(option)" [value]="option.value">
             {{ option.label }}
           </mat-button-toggle>
         }

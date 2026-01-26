@@ -9,6 +9,7 @@ import {Utils} from '@/classes/utils';
 import {MatSlideToggleChange} from '@angular/material/slide-toggle';
 import {BoardData} from '@/_model/board-data';
 import {FormsModule} from '@angular/forms';
+import {GLOBALS} from '@/_services/globals.service';
 
 @Component({
   selector: 'app-site-puzzlendar',
@@ -36,7 +37,7 @@ export class SitePuzzlendarComponent implements AfterViewInit, OnDestroy {
   constructor(public ps: PuzzlendarService,
               public msg: MessageService,
               public progress: ProgressService) {
-    setTimeout(() => this.clickTest(null, this.testDate));
+    // setTimeout(() => this.clickTest(null, this.testDate));
     ps.filterOrientation = this.orientList.map(e => e.value);
     ps.showColors = 1;
   }
@@ -133,6 +134,18 @@ export class SitePuzzlendarComponent implements AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit() {
+    if (GLOBALS.env?.urlParams?.puzzlendar === 'next') {
+      setTimeout(() => {
+        const date = Utils.addDateDays(new Date(), 1);
+        const m = date.getMonth() + 1;
+        const d = date.getDate();
+        const w = Utils.getDow(date);
+        this.ps.brd.date = w * 10000 + m * 100 + d;
+        if (this.ps._solutions[this.ps.brd.date][0] !== '*') {
+          this.clickSolve(null, 'day');
+        }
+      });
+    }
   }
 
   onOrientChange(evt: any) {

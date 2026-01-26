@@ -185,102 +185,53 @@ export class PuzzlendarSolver {
 
   findSolution(alreadyFound: string[], single: string, type: string) {
     this.clearBoard();
-    let perms = [single];
     alreadyFound ??= [];
     if (type === 'solve-oneperday' && alreadyFound.length > 0) {
       postMessage({cmd: 'oneperdaySolution', ...this.boardData});
       return;
     }
-    if (true || single == null) {
-      const src = this.parts.map(p => p.key).join('');
-      const max = Array.from({length: src.length}, (_, i) => i + 1)
-        .reduce((acc, val) => acc * val, 1);
-      const data: TryData = {
-        idx: 0,
-        last: 0,
-        max: max,
-        src: src,
-        type: type,
-        b: null,
-        single: single,
-        alreadyFound: alreadyFound,
-        startAt: alreadyFound?.[alreadyFound?.length - 1]
-      }
-      for (const p of permutationen(data.src)) {
-        if (!this.trySolution(p, data)) {
-          return;
-        }
-      }
-      switch (type) {
-        case 'solve-single':
-          postMessage({cmd: 'solution', ...this.boardData});
-          break;
-        case 'solve-day':
-          if (data.b != null) {
-            this.board.rows = data.b;
-          }
-          postMessage({cmd: 'finalSolution', ...this.boardData});
-          break;
-        case 'solve-all':
-          postMessage({cmd: 'daySolution', ...this.boardData});
-          break;
-        case 'solve-oneperday':
-          postMessage({cmd: 'noSolutionForDay', ...this.boardData});
-          break;
-      }
+    if (type === 'solve-all' && alreadyFound?.[0] === '*') {
+      postMessage({cmd: 'dayComplete', ...this.boardData});
       return;
     }
-    // let idx = 0;
-    // let b: number[][] = null;
-    // let lastProgress = 0;
-    // if (alreadyFound.indexOf('*') < 0) {
-    //   for (const src of perms) {
-    //     if (single != null || alreadyFound.indexOf(src) < 0) {
-    //       lastProgress++;
-    //       if (lastProgress > 1000) {
-    //         lastProgress = 0;
-    //         postMessage({cmd: 'progress', max: perms.length, value: idx});
-    //       }
-    //       if (this.placeParts(src)) {
-    //         if (type === 'solve-day' || type === 'solve-all') {
-    //           if (b == null) {
-    //             b = this.board.rows.map(row => row.map(f => f));
-    //           }
-    //           lastProgress = 0;
-    //           postMessage({cmd: 'partialSolution', ...this.boardData});
-    //         } else if (type === 'solve-oneperday') {
-    //           lastProgress = 0;
-    //           postMessage({cmd: 'oneperdaySolution', ...this.boardData});
-    //           return;
-    //         } else {
-    //           lastProgress = 0;
-    //           postMessage({cmd: 'solution', ...this.boardData});
-    //           return;
-    //         }
-    //       }
-    //     }
-    //     idx++;
-    //   }
-    // }
-    //
-    // switch (type) {
-    //   case 'solve-single':
-    //     postMessage({cmd: 'solution', ...this.boardData});
-    //     break;
-    //   case 'solve-day':
-    //     if (b != null) {
-    //       this.board.rows = b;
-    //     }
-    //     postMessage({cmd: 'finalSolution', ...this.boardData});
-    //     break;
-    //   case 'solve-all':
-    //     postMessage({cmd: 'daySolution', ...this.boardData});
-    //     break;
-    //   case 'solve-oneperday':
-    //     lastProgress = 0;
-    //     postMessage({cmd: 'noSolutionForDay', ...this.boardData});
-    //     break;
-    // }
+    const src = this.parts.map(p => p.key).join('');
+    const max = Array.from({length: src.length}, (_, i) => i + 1)
+      .reduce((acc, val) => acc * val, 1);
+    const data: TryData = {
+      idx: 0,
+      last: 0,
+      max: max,
+      src: src,
+      type: type,
+      b: null,
+      single: single,
+      alreadyFound: alreadyFound,
+      startAt: alreadyFound?.[alreadyFound?.length - 1]
+    }
+    const permList = permutationen(data.src);
+    for (const p of permList) {
+      if (!this.trySolution(p, data)) {
+        return;
+      }
+    }
+    switch (type) {
+      case 'solve-single':
+        postMessage({cmd: 'solution', ...this.boardData});
+        break;
+      case 'solve-day':
+        if (data.b != null) {
+          this.board.rows = data.b;
+        }
+        postMessage({cmd: 'finalSolution', ...this.boardData});
+        break;
+      case 'solve-all':
+        postMessage({cmd: 'daySolution', ...this.boardData});
+        break;
+      case 'solve-oneperday':
+        postMessage({cmd: 'noSolutionForDay', ...this.boardData});
+        break;
+    }
+    return;
   }
 
   trySolution(src: string, data: TryData): boolean {

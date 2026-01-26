@@ -5,13 +5,10 @@ import {LottoService} from '@/_services/lotto.service';
 // syntax. However, rollup creates a synthetic default module and we thus need to import it using
 // the `default as` syntax.
 // tslint:disable-next-line:no-duplicate-imports
-import * as _moment from 'moment';
-import {default as _rollupMoment} from 'moment';
 import {GLOBALS, GlobalsService} from '@/_services/globals.service';
 import {Utils} from '@/classes/utils';
 import {DatepickerPeriod} from '@/_model/datepicker-period';
-
-const moment = _rollupMoment || _moment;
+import {DomSanitizer} from '@angular/platform-browser';
 
 @Component({
   selector: 'app-site-lotto',
@@ -21,6 +18,8 @@ const moment = _rollupMoment || _moment;
 })
 export class SiteLottoComponent {
   listTitle = ['gesamt', 'Mittwoch', 'Samstag'];
+  scheine = [[9, 13, 16, 27, 32, 36]];
+//  scheine = [[9, 13, 16, 27, 32, 36], [3, 15, 29, 33, 35, 47]];
   listRows: any[] = [{
     title: 'Ziehungen',
     count: (row: number, day: number): number => this.list(day)?.length
@@ -43,10 +42,10 @@ export class SiteLottoComponent {
     title: '6 richtige',
     count: (row: number, day: number): number => this.hits(6, day)
   }];
-  scheine = [[9, 13, 16, 27, 32, 36], [3, 15, 29, 33, 35, 47]];
 
   constructor(public ls: LottoService,
-              public globals: GlobalsService) {
+              public globals: GlobalsService,
+              public sani: DomSanitizer) {
     const date = GLOBALS.siteConfig.lottoDate ?? Utils.fmtDate(new Date(), 'yyyyMMdd');
     this.period = new DatepickerPeriod(`${date}|${date}|3months|1|+++++++}`);
   }
@@ -60,11 +59,13 @@ export class SiteLottoComponent {
   set period(value: DatepickerPeriod) {
     this._period = value;
     GLOBALS.siteConfig.lottoDate = +Utils.fmtDate(value.start, 'yyyyMMdd');
+    this.ls.calculate();
   }
 
   hits(count: number, day: number) {
     const list = this.list(day) ?? [];
-    let ret = 0;
+    let ret: any = 0;
+    let lastDate = -1;
     for (const data of list) {
       for (const schein of this.scheine) {
         let cnt = 0;
@@ -73,10 +74,17 @@ export class SiteLottoComponent {
             cnt++;
           }
         }
-        if (cnt === count) {
+        if (cnt >= count) {
           ret++;
+          lastDate = data.date;
         }
       }
+    }
+    if (ret === 1) {
+      ret = Utils.fmtDate(Utils.getDate(lastDate), 'dd.MM.yyyy');
+    }
+    if (ret === 0) {
+      ret = this.sani.bypassSecurityTrustHtml('<span style="color:maroon" class="material-icons">clear</span>');
     }
     return ret;
   }
@@ -88,5 +96,13 @@ export class SiteLottoComponent {
 
   changeSchein(numbers: number[], idx: number) {
     this.scheine[idx] = numbers;
+  }
+
+  onTicketDelete(idx: number) {
+    this.scheine.splice(idx, 1);
+  }
+
+  onTicketAdd() {
+    this.scheine.push([]);
   }
 }

@@ -7,6 +7,7 @@ import {BoardData, BoardType} from '@/_model/board-data';
 import {PuzzlendarSolver} from '@/_services/puzzlendar.solver';
 import {HttpClient, HttpRequest} from '@angular/common/http';
 import {PartData} from '@/_model/part-data';
+import {DialogResultButton} from '@/_model/dialog-data';
 
 @Injectable({
   providedIn: 'root'
@@ -43,7 +44,7 @@ export class PuzzlendarService extends WorkerService {
     return count === this.brd.validCount;
   }
 
-  loadFromStorage(onDone: (data: any) => void) {
+  loadFromAsset(onDone: (data: any) => void) {
     const req = new HttpRequest(
       'GET',
       `assets/${PuzzlendarService.LS_SOLUTIONS_KEY}.json`,
@@ -59,7 +60,7 @@ export class PuzzlendarService extends WorkerService {
         onDone(body.body);
         this.msg.confirm('Sollen die lokalen Daten überschrieben werden?').subscribe(result => {
           switch (result.btn) {
-            case 'yes':
+            case DialogResultButton.yes:
               localStorage.setItem(PuzzlendarService.LS_SOLUTIONS_KEY, JSON.stringify(this._solutions));
               this.mayChangeSolutions = true;
               break;
@@ -82,7 +83,7 @@ export class PuzzlendarService extends WorkerService {
     this.initBoard(JSON.parse(localStorage.getItem(PuzzlendarService.LS_SOLUTIONS_KEY) ?? '{}'));
     this.mayChangeSolutions = true;
     if (loadFromAsset) {
-      this.loadFromStorage(this.initBoard.bind(this));
+      this.loadFromAsset(this.initBoard.bind(this));
     }
   }
 
@@ -188,6 +189,7 @@ export class PuzzlendarService extends WorkerService {
         break;
       case 'partialSolution':
         this.saveSolution(data);
+        this.copySolutionToClipboard();
         this.setProgressInfo(data.brd);
         if (this.progress.isStopped) {
           this.stop();
@@ -213,12 +215,17 @@ export class PuzzlendarService extends WorkerService {
         break;
       case 'daySolution':
       case 'oneperdaySolution':
+      case 'dayComplete':
         if (data.cmd === 'daySolution') {
           if (this._solutions[data.brd.date] != null) {
             this.finalizeSolution(data.brd.date);
           }
         }
-        this.saveSolution(data);
+        if (data.cmd !== 'dayComplete') {
+          this.saveSolution(data);
+        } else {
+          data.cmd = 'daySolution';
+        }
         const d = BoardData.decodeDate(data.brd.date);
         d.d++;
         if (d.d === 32) {
@@ -365,9 +372,13 @@ export class PuzzlendarService extends WorkerService {
   copySolutionToClipboard() {
     try {
       const text = JSON.stringify(this._solutions, null, ' ');
-      navigator.clipboard.writeText(text);
+      navigator.clipboard.writeText(text)
+        .then()
+        .catch(_err =>
+          console.error('no access to clipboard')
+        );
     } catch (err) {
-      console.error('Fehler beim Kopieren:', err);
+      console.error('error when pasting to clipboard:', err);
     }
   }
 }
