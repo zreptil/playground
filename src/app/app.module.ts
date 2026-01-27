@@ -40,6 +40,7 @@ import {DatepickerComponent} from '@/controls/datepicker/datepicker.component';
 import {DatepickerDialogComponent} from '@/controls/datepicker/datepicker-dialog/datepicker-dialog.component';
 import {DatepickerMonthComponent} from '@/controls/datepicker/datepicker-month/datepicker-month.component';
 import {LottoTicketComponent} from '@/components/site-lotto/lotto-ticket/lotto-ticket.component';
+import {SiteTactaComponent} from '@/components/site-tacta/site-tacta.component';
 
 export const DATE_FORMAT = {
   parse: {
@@ -92,7 +93,9 @@ export const DATE_FORMAT = {
     ProgressComponent,
     NgOptimizedImage,
     ReactiveFormsModule,
-    SitePuzzlendarComponent, LottoTicketComponent
+    SitePuzzlendarComponent,
+    LottoTicketComponent,
+    SiteTactaComponent
   ],
   providers: [
     provideAnimations(),

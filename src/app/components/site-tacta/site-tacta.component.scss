@@ -1,0 +1,9 @@
+:host {
+  display: flex;
+  flex-flow: row;
+  align-items: center;
+  justify-content: center;
+  height: calc(100vh - 48px);
+  background: silver;
+  position: relative;
+}

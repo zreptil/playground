@@ -1,0 +1,6 @@
+<div [style]="styleForDiv">
+  <canvas #canvas></canvas>
+  @for (linkGame of game.linkedCards; track $index) {
+    <app-tacta-card [game]="linkGame" [style]="styleForLinked(linkGame.parentLink)"></app-tacta-card>
+  }
+</div>

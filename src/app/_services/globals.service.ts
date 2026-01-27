@@ -53,7 +53,8 @@ export class GlobalsService {
     {id: 'pdf'},
     {id: 'collatz'},
     {id: 'lotto'},
-    {id: 'puzzlendar'}
+    {id: 'puzzlendar'},
+    {id: 'tacta'}
   ];
   dragPos: any = {};
   editColors = false;
