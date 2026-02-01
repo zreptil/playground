@@ -1,9 +1,46 @@
 :host {
-  display: flex;
-  flex-flow: row;
+  display: grid;
+  grid-template-columns: 1fr 3fr;
   align-items: center;
   justify-content: center;
+  width: 100vw;
   height: calc(100vh - 48px);
   background: silver;
   position: relative;
+
+  [cards] {
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    justify-content: space-between;
+    flex: 1;
+    height: 100%;
+    overflow-y: auto;
+
+    [player] {
+      display: flex;
+      flex: 1;
+      flex-flow: column;
+      align-items: center;
+      justify-content: center;
+
+      [name] {
+        font-size: 1.5em;
+        font-weight: bold;
+        margin: 1em;
+      }
+
+      [hand] {
+        display: flex;
+        flex-flow: row;
+        gap: 1em;
+      }
+    }
+  }
+
+  [board] {
+    display: flex;
+    flex-flow: row wrap;
+    overflow-y: auto;
+  }
 }

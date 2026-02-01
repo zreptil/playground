@@ -479,4 +479,17 @@ export class Utils {
     return Array.from({length: value}, (_, i) => i + 1)
       .reduce((acc, val) => acc * val, 1);
   }
+
+  static hex(value: number, precision = 2) {
+    return value.toString(16).padStart(precision, '0');
+  }
+
+  static randomNumbers(count: number, start = 1): number[] {
+    let ret = Array.from({length: count}, (_, i) => i + start);
+    for (let i = ret.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [ret[i], ret[j]] = [ret[j], ret[i]];
+    }
+    return ret;
+  }
 }

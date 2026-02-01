@@ -2,25 +2,30 @@ import {Component} from '@angular/core';
 import {MessageService} from '@/_services/message.service';
 import {TactaCardComponent} from '@/controls/tacta-card/tacta-card.component';
 import {TactaService} from '@/_services/tacta.service';
+import {Utils} from '@/classes/utils';
+import {TactaBoardComponent} from '@/controls/tacta-board/tacta-board.component';
 
 @Component({
   selector: 'app-site-tacta',
   imports: [
-    TactaCardComponent
+    TactaCardComponent,
+    TactaBoardComponent
   ],
   templateUrl: './site-tacta.component.html',
   styleUrl: './site-tacta.component.scss'
 })
 export class SiteTactaComponent {
 
+  protected readonly Utils = Utils;
+
   constructor(public msg: MessageService,
               public ts: TactaService) {
     this.ts.createDeck();
-    // this.cards = [
-    //   new CardConfig({color: '#d04f94', suite: 3, areas: 'c1i1l0'}),
-    //   new CardConfig({color: '#e4aa42', suite: 4, areas: 'c1f2l0'}),
-    //   new CardConfig({color: '#6857a5', suite: 4, areas: 'c0i1p3'}),
-    //   new CardConfig({color: '#88c056', suite: 0, areas: 'c1i1p3'}),
-    // ];
+    this.ts.createPlayer('Zreptil');
+    this.ts.createPlayer('Player 1');
+    // this.ts.createPlayer('Player 2');
+    // this.ts.createPlayer('Player 3');
+    // this.ts.createPlayer('Player 4');
+    // this.ts.createPlayer('Player 5');
   }
 }

@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Injectable, signal} from '@angular/core';
 import {Utils} from '@/classes/utils';
 import {Log} from '@/_services/log.service';
 import {HttpClient, HttpRequest} from '@angular/common/http';
@@ -107,17 +107,19 @@ export class GlobalsService {
     this.saveSharedData();
   }
 
-  _isDebug = false;
+  _isDebug = signal<boolean>(false);
 
   get isDebug(): boolean {
-    return this._isDebug && Log.mayDebug;
+    return this._isDebug() && Log.mayDebug;
   }
 
   set isDebug(value: boolean) {
     if (!Log.mayDebug) {
       value = false;
     }
-    this._isDebug = value;
+    if (this._isDebug() !== value) {
+      this._isDebug.set(value);
+    }
   }
 
   get mayDebug(): boolean {
