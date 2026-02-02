@@ -1,5 +1,5 @@
 import {AfterViewInit, Component, effect, ElementRef, input, Input, signal, ViewChild} from '@angular/core';
-import {CardConfig, GameConfig, TactaService} from '@/_services/tacta.service';
+import {CardConfig, TactaService} from '@/_services/tacta.service';
 import {GLOBALS} from '@/_services/globals.service';
 import {TactaCanvas, TactaCardService} from '@/_services/tacta-card.service';
 
@@ -15,19 +15,14 @@ import {TactaCanvas, TactaCardService} from '@/_services/tacta-card.service';
   styleUrl: './tacta-card.component.scss'
 })
 export class TactaCardComponent implements AfterViewInit {
-  @ViewChild('canvas', {static: false})
+  @ViewChild('canvasHtml', {static: false})
   canvasRef!: ElementRef<HTMLCanvasElement>;
-  // @Input()  game: GameConfig;
-  game = input<GameConfig>(null)
+  canvas = input<TactaCanvas>(null)
   lastCardIdx: number = null;
-
   @Input()
   info: string;
-
   @Input()
   cardStyle: any;
-  cvs: TactaCanvas;
-
   refresh = signal<boolean>(false);
   initialized = false;
   private ctx!: CanvasRenderingContext2D;
@@ -36,16 +31,19 @@ export class TactaCardComponent implements AfterViewInit {
               public tcs: TactaCardService) {
     effect(() => {
       // GLOBALS.isDebug needs to be accessed to activate effect on changes
-      GLOBALS.isDebug;
-      const test = this.ts.markedCanvas();
-      if (this.initialized && this.lastCardIdx != this.game()?.cardIdx) {
-        this.updateGame();
-      }
-      this.refresh();
-      if (this.cvs != null) {
+      // noinspection JSUnusedLocalSymbols
+      const test: any = this.ts.markedCanvas() || GLOBALS.isDebug || this.refresh();
+      if (this.initialized && this.lastCardIdx !== this.cvs.cardIdx) {
+        this.updateCanvas();
+      } else if (this.cvs != null && this.ctx != null) {
+        this.cvs.ctx = this.ctx;
         this.tcs.drawCard(this.cvs);
       }
     });
+  }
+
+  get cvs() {
+    return this.canvas();
   }
 
   // get styleForDiv(): any {
@@ -58,25 +56,24 @@ export class TactaCardComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
     const canvas = this.canvasRef.nativeElement;
+    canvas.width = CardConfig.defWidth * 2;
+    canvas.height = CardConfig.defHeight * 2;
     this.ctx = canvas.getContext('2d')!;
     setTimeout(() => {
-      this.updateGame();
+      this.updateCanvas();
       this.initialized = true;
     });
   }
 
-  updateGame() {
-    this.cvs = this.ts.createTactaCanvas({
-      ctx: this.ctx,
-      cardWidth: CardConfig.defWidth * 2,
-      cardHeight: CardConfig.defHeight * 2,
-      cardBorder: CardConfig.defBorder * 2,
-      game: this.game()
-    });
+  updateCanvas() {
+    this.cvs.ctx = this.ctx;
+    this.cvs.cardWidth = CardConfig.defWidth * 2;
+    this.cvs.cardHeight = CardConfig.defHeight * 2;
+    this.cvs.cardBorder = CardConfig.defBorder * 2;
     const canvas = this.canvasRef.nativeElement;
     canvas.width = this.cvs.cardWidth;
     canvas.height = this.cvs.cardHeight;
-    this.lastCardIdx = this.game().cardIdx;
+    this.lastCardIdx = this.cvs.cardIdx;
     this.tcs.drawCard(this.cvs);
   }
 
@@ -97,7 +94,6 @@ export class TactaCardComponent implements AfterViewInit {
         }
       }
       this.ts.clearMarkedAreas();
-      this.ts.markedCanvas.set(null);
     } else {
       this.ts.clearMarkedAreas();
       this.cvs.markedAreas = area;

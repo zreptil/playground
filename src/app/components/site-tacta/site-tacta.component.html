@@ -1,24 +1,37 @@
 <div cards>
   @for (player of ts.players; track $index) {
     <div player>
-      <div name>{{ player.name }}</div>
+      <div name>
+        {{ player.name }}
+        @if (globals.isDebug) {
+          <button (click)="clickCycle($event, player)" mat-icon-button>
+            <mat-icon>360</mat-icon>
+          </button>
+        }
+      </div>
       <div hand>
         @if (player.cards.length > 0) {
-          <app-tacta-card [game]="player.game(0)" info="{{Utils.hex(player.cards[0])}}"></app-tacta-card>
+          <app-tacta-card [canvas]="ts.cardOfPlayer(player, 0,0)"></app-tacta-card>
           @if (player.cards.length > 1) {
-            <app-tacta-card [game]="player.game(player.cards.length - 1)" info="{{Utils.hex(player.cards[player.cards.length - 1])}}"></app-tacta-card>
+            <app-tacta-card [canvas]="ts.cardOfPlayer(player, 1, player.cards.length - 1)"></app-tacta-card>
           }
         }
       </div>
+      <div score>
+        {{ score(player) }} / {{ cardCount(player) }}
+      </div>
+      @if ($index !== ts.playerIdx) {
+        <div disable></div>
+      }
     </div>
   }
 </div>
 <div board>
-  @for (game of ts.games; track $index) {
-    @if (ts.games.length > 1) {
-      <app-tacta-card [game]="game" info="{{Utils.hex($index)}}"></app-tacta-card>
+  @for (cvs of ts.board; track $index) {
+    @if (ts.board.length > 1) {
+      <app-tacta-card [canvas]="cvs" info="{{Utils.hex($index)}}"></app-tacta-card>
     } @else {
-      <app-tacta-board [game]="game"></app-tacta-board>
+      <app-tacta-board [canvas]="cvs"></app-tacta-board>
     }
   }
 </div>

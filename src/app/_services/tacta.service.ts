@@ -6,19 +6,17 @@ export class Player {
   name: string;
   color: number;
   cards: number[] = [];
-
-  game(idx: number) {
-    return new GameConfig(this.cards[idx], -1, '');
-  }
+  score = 0;
+  cvs: TactaCanvas[] = [];
 }
 
 export class CardConfig {
-  static scale = 5;
+  static scale = 1;
   static defWidth = 64;
   static defHeight = 89;
   static defBorder = 1.5;
-  colors: { s: string, f: string, sm: string, fm: string } = {
-    s: '#ffffff', f: '#000000', sm: '#ffff00', fm: '#aaaaaa'
+  colors: { s: string, f: string, sm: string, fm: string, dm: string } = {
+    s: '#ffffff', f: '#000000', sm: '#ffff00', fm: '#aaaaaa', dm: '#555555'
   };
   suite: number;
   cardId: number;
@@ -44,60 +42,25 @@ export class CardConfig {
   }
 }
 
-export class GameConfig {
-  linkedCards: GameConfig[] = [];
-
-  constructor(public cardIdx: number,
-              public turnIdx: number,
-              public parentLink?: string) {
-  }
-
-  get asString(): string {
-    const ret: string[] = [];
-    ret.push(`${Utils.hex(this.cardIdx)}${Utils.hex(this.turnIdx)}${this.parentLink ?? '--'}[`);
-    for (const link of this.linkedCards) {
-      ret.push(link.asString);
-    }
-    ret.push(']');
-    return Utils.join(ret, '');
-  }
-
-  static fromString(src: string, games: GameConfig[], i = 0): number {
-    while (i < src.length && src[i] !== ']') {
-      const cardIdx = parseInt(src.substring(i, i + 2), 16);
-      const turnIdx = parseInt(src.substring(i + 2, i + 4), 16);
-      const parentLink = src.substring(i + 4, i + 6);
-      const ret = new GameConfig(cardIdx, turnIdx, parentLink);
-      games.push(ret);
-      i += 8;
-      while (src[i - 1] !== ']') {
-        i = GameConfig.fromString(src, ret.linkedCards, i - 1);
-      }
-    }
-    return i + 1;
-  }
-}
-
 @Injectable({
   providedIn: 'root'
 })
 export class TactaService {
   colors: any = {
-    0: {s: 'white', f: '#000000', sm: '#ffff00', fm: '#aaaaaa'},
-    1: {s: 'white', f: '#e59739', sm: '#ffff00', fm: '#aaaaaa'},
-    2: {s: 'white', f: '#da3925', sm: '#ffff00', fm: '#aaaaaa'},
-    3: {s: 'white', f: '#df3ec0', sm: '#ffff00', fm: '#aaaaaa'},
-    4: {s: 'white', f: '#4535d4', sm: '#ffff00', fm: '#aaaaaa'},
-    5: {s: 'white', f: '#77b4f8', sm: '#ffff00', fm: '#aaaaaa'},
-    6: {s: 'white', f: '#8adb5a', sm: '#ffff00', fm: '#aaaaaa'}
+    0: {s: 'white', f: '#000000', sm: '#ffff00', fm: '#aaaaaa', dm: '#555555'},
+    1: {s: 'white', f: '#e59739', sm: '#ffff00', fm: '#aaaaaa', dm: '#555555'},
+    2: {s: 'white', f: '#da3925', sm: '#ffff00', fm: '#aaaaaa', dm: '#555555'},
+    3: {s: 'white', f: '#df3ec0', sm: '#ffff00', fm: '#aaaaaa', dm: '#555555'},
+    4: {s: 'white', f: '#4535d4', sm: '#ffff00', fm: '#aaaaaa', dm: '#555555'},
+    5: {s: 'white', f: '#77b4f8', sm: '#ffff00', fm: '#aaaaaa', dm: '#555555'},
+    6: {s: 'white', f: '#8adb5a', sm: '#ffff00', fm: '#aaaaaa', dm: '#555555'}
   };
-
   deck: CardConfig[];
+  board: TactaCanvas[];
   players: Player[];
-
-  games: GameConfig[];
+  playerIdx: number = 0;
   connectors: any = {
-    ai: {x: 58, y: -6, deg: -135},
+    ai: {x: 0, y: -22, deg: -135},
     aj: {x: 11, y: 0, deg: -45},
     ak: {x: 0, y: 22, deg: 45},
     al: {x: -11, y: 0, deg: 135},
@@ -113,14 +76,14 @@ export class TactaService {
     dj: {x: 109, y: -71, deg: 45},
     dk: {x: 98, y: 93, deg: 135},
     dl: {x: -110, y: 71, deg: -135},
-    ee: {x: 0, y: -13, deg: 180},
+    ee: {x: 0, y: -12, deg: 180},
     ef: {x: 0, y: -12, deg: -90},
-    eg: {x: 0, y: 13, deg: 0},
+    eg: {x: 0, y: 12, deg: 0},
     eh: {x: 0, y: 12, deg: 90},
     fe: {x: 0, y: -84, deg: 90},
-    ff: {x: 100, y: -13, deg: 180},
+    ff: {x: 100, y: -12, deg: 180},
     fg: {x: 0, y: 84, deg: -90},
-    fh: {x: -100, y: 13, deg: 0},
+    fh: {x: -100, y: 12, deg: 0},
     ge: {x: -100, y: -112, deg: 0},
     gf: {x: 137, y: -84, deg: 90},
     gg: {x: 100, y: 112, deg: 180},
@@ -138,9 +101,9 @@ export class TactaService {
     jc: {x: 44, y: 117, deg: -135},
     jd: {x: -142, y: 46, deg: -45},
     ka: {x: -156, y: -75, deg: -45},
-    kb: {x: 85, y: -127, deg: 45},
+    kb: {x: 85, y: -126, deg: 45},
     kc: {x: 156, y: 75, deg: 135},
-    kd: {x: -85, y: 127, deg: -135},
+    kd: {x: -85, y: 126, deg: -135},
     la: {x: -72, y: 5, deg: 225},
     lb: {x: -26, y: -66, deg: -45},
     lc: {x: 72, y: -5, deg: 45},
@@ -166,9 +129,16 @@ export class TactaService {
   // global signal to refresh all instances of TactaCard
   markedCanvas = signal<TactaCanvas>(null);
 
-  get gamesAsString(): string {
-    return this.games?.reduce((a, b) => a + b.asString, '') ?? '';
+  cardOfPlayer(player: Player, id: number, idx: number) {
+    if (player.cvs[id] == null) {
+      player.cvs[id] = new TactaCanvas({cardIdx: player?.cards?.[idx], turnIdx: -1, scale: 2}, this);
+    }
+    return player.cvs[id];
   }
+
+  // get gamesAsString(): string {
+  //   return this.games?.reduce((a, b) => a + b.asString, '') ?? '';
+  // }
 
   card(data: any) {
     const ret = new CardConfig();
@@ -184,7 +154,6 @@ export class TactaService {
   }
 
   createDeck() {
-    CardConfig.scale = 2;
     this.deck = [];
     this.addToDeck({color: 0, suite: 4});
     for (let i = 1; i <= 6; i++) {
@@ -212,24 +181,34 @@ export class TactaService {
     this.addToDeck({color: 0, suite: 3, areas: 'i0j0k0l0'});
     this.addToDeck({color: 0, suite: 4, areas: 'm0n0o0p0'});
     this.addToDeck({color: 0, suite: 4, areas: 'q0r0'});
-    this.games = [];
     let src = '';
     let idx = 0;
     for (let i = 0; i < this.deck.length; i++) {
       src += `${Utils.hex(i)}${Utils.hex(idx++)}--[]`;
     }
     // src = '0000--[]6d01--[]6e02--[]6f03--[]7004--[]7105--[]';
+    // src = '0000--[6d01ai[]6d02aj[]6d03ak[]6d04al[]]';
+    // src = '0000--[6d01bi[]6d02bj[]6d03bk[]6d04bl[]]';
+    // src = '0000--[6d01ci[]6d02cj[]6d03ck[]6d04cl[]]';
+    // src = '0000--[6d01di[]6d02dj[]6d03dk[]6d04dl[]]';
+    // src = '0000--[6e01ee[]6e02ef[]6e03eg[]6e04eh[]]';
+    // src = '0000--[6e01fe[]6e02ff[]6e03fg[]6e04fh[]]';
+    // src = '0000--[6e01ge[]6e02gf[]6e03gg[]6e04gh[]]';
+    // src = '0000--[6e01he[]6e02hf[]6e03hg[]6e04hh[]]';
+    // src = '0000--[6f01ia[]6f02ib[]6f03ic[]6f04id[]]';
+    // src = '0000--[6f01ja[]6f02jb[]6f03jc[]6f04jd[]]';
+    // src = '0000--[6f01ka[]6f02kb[]6f03kc[]6f04kd[]]';
+    // src = '0000--[6f01la[]6f02lb[]6f03lc[]6f04ld[]]';
+    // src = '0000--[7001mm[]7002mn[]7003mo[]7004mp[]]';
+    // src = '0000--[7001nm[]7002no[]]';
+    // src = '0000--[7001om[]7002on[]7003oo[]7004op[]]';
+    // src = '0000--[7001pm[]7002po[]]';
+    // src = '0000--[7101qq[]7102qr[]]';
+    // src = '0000--[7101rq[]7102rr[]]';
     src = '0000--[]';
-    GameConfig.fromString(src, this.games);
+    this.board = [];
+    TactaCanvas.fromString(src, this.board, this);
   }
-
-  // scaleDeck() {
-  //   for (const card of this.deck) {
-  //     card.width = 64 * CardConfig.scale;
-  //     card.height = 89 * CardConfig.scale;
-  //     card.border = 1.5 * CardConfig.scale;
-  //   }
-  // }
 
   createPlayer(name: string, color = -1, cards: number[] = null) {
     this.players ??= [];
@@ -252,7 +231,6 @@ export class TactaService {
     player.color = Math.floor(start / 18);
     player.cards = cards ?? Utils.randomNumbers(18, start);
     this.players.push(player);
-    console.log(name, colors, start, player.cards);
   }
 
   createTactaCanvas(src: any) {
@@ -265,6 +243,12 @@ export class TactaService {
     for (const cvs of this.cvsList) {
       cvs.markedAreas = '';
     }
+    for (const player of this.players) {
+      for (const key of Object.keys(player.cvs)) {
+        player.cvs[+key].markedAreas = '';
+      }
+    }
+    this.markedCanvas.set(null);
   }
 
   adjustDimensions(cvs: TactaCanvas, values: any) {
@@ -278,16 +262,68 @@ export class TactaService {
 
   moveMarkedToBoard(cvs: TactaCanvas, dst: TactaCanvas) {
     const src = this.markedCanvas();
+    if (src == null || dst == null) {
+      return;
+    }
     src.parentLink = `${src.markedAreas}${dst.markedAreas}`;
     src.ctx = cvs.ctx;
     src.cardWidth = cvs.cardWidth;
     src.cardHeight = cvs.cardHeight;
     src.cardBorder = cvs.cardBorder;
+    src.turnIdx = this.highestTurn(cvs) + 1;
     dst.cards.push(src);
     for (const player of this.players) {
       player.cards = player.cards.filter(c => c !== src.cardIdx);
+      player.cvs = [];
     }
-    this.markedCanvas.set(null);
     this.clearMarkedAreas();
+    this.playerIdx = (this.playerIdx + 1) % this.players.length;
+    this.calcScore(cvs);
+  }
+
+  cardColor(cardIdx: number) {
+    return Math.floor((cardIdx - 1) / 18);
+  }
+
+  playerForCard(cardIdx: number) {
+    const color = Math.floor((this.normalizeCardIdx(cardIdx) - 1) / 18);
+    return this.players.find(p => p.color === color);
+  }
+
+  normalizeCardIdx(cardIdx: number) {
+    return cardIdx > 127 ? cardIdx - 128 : cardIdx;
+  }
+
+  calcScore(cvs: TactaCanvas, init = true) {
+    if (init) {
+      console.log('Auf gehts', cvs);
+      for (const player of this.players) {
+        player.score = 0;
+      }
+    }
+    const cardIdx = this.normalizeCardIdx(cvs.cardIdx);
+    for (let i = 0; i < this.deck[cardIdx].areas.length; i += 2) {
+      const id = this.deck[cardIdx].areas.substring(i, i + 1);
+      const score = +(this.deck[cardIdx].areas.substring(i + 1, i + 2));
+      if (score > 0) {
+        if (!cvs.cards.some(c => c.parentLink.endsWith(id))) {
+          const p = this.playerForCard(cardIdx);
+          if (p != null) {
+            p.score += score;
+          }
+        }
+      }
+    }
+    for (const card of cvs.cards) {
+      this.calcScore(card, false);
+    }
+  }
+
+  highestTurn(cvs: TactaCanvas, max = 0) {
+    max = Math.max(max, cvs.turnIdx);
+    for (const card of cvs.cards) {
+      max = Math.max(max, this.highestTurn(card, max));
+    }
+    return max;
   }
 }

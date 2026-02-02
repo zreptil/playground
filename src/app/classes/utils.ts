@@ -492,4 +492,83 @@ export class Utils {
     }
     return ret;
   }
+
+  static ZoomConfig(element: HTMLElement,
+                    scale: number,
+                    minScale: number,
+                    maxScale: number,
+                    onUpdateScale: (scale: number) => void,
+                    onDown: (x: number, y: number) => void,
+                    onMove: (dx: number, dy: number) => void
+  ) {
+    new ZoomConfig(element, scale, minScale, maxScale, onUpdateScale, onDown, onMove);
+  }
+}
+
+export class ZoomConfig {
+  pointers = new Map<number, PointerEvent>();
+  lastPinchDistance = 0;
+
+  constructor(element: HTMLElement,
+              public scale: number,
+              public minScale: number,
+              public maxScale: number,
+              private onUpdateScale: (scale: number) => void,
+              private onDown: (x: number, y: number) => void,
+              private onMove: (dx: number, dy: number) => void
+  ) {
+    element.addEventListener('wheel', (evt: WheelEvent) => {
+      evt.preventDefault();
+      this.updateScale(this.scale * (evt.deltaY < 0 ? 1.1 : 0.9));
+    }, {passive: false});
+    element.addEventListener('pointerdown', (evt: PointerEvent) => {
+      this.pointers.set(evt.pointerId, evt);
+      this.onDown(evt.x, evt.y);
+    });
+    element.addEventListener('pointermove', (evt: PointerEvent) => {
+      if (!this.pointers.has(evt.pointerId)) {
+        return;
+      }
+      if (this.pointers.size === 1) {
+        this.onMove(
+          evt.x - this.pointers.get(evt.pointerId).x,
+          evt.y - this.pointers.get(evt.pointerId).y
+        );
+        return;
+      }
+      this.pointers.set(evt.pointerId, evt);
+      if (this.pointers.size === 2) {
+        const [p1, p2] = Array.from(this.pointers.values());
+
+        const distance = Math.hypot(
+          p2.clientX - p1.clientX,
+          p2.clientY - p1.clientY
+        );
+
+        if (this.lastPinchDistance !== 0) {
+          this.updateScale(this.scale * distance / this.lastPinchDistance);
+        }
+
+        this.lastPinchDistance = distance;
+      }
+    });
+    element.addEventListener('pointerup', (evt: PointerEvent) => {
+      this.pointers.delete(evt.pointerId);
+      if (this.pointers.size < 2) {
+        this.lastPinchDistance = 0;
+      }
+    });
+    element.addEventListener('pointercancel', (_evt: PointerEvent) => {
+      this.pointers = new Map<number, PointerEvent>();
+      this.lastPinchDistance = 0;
+    });
+  }
+
+  updateScale(scale: number) {
+    this.scale = Math.min(
+      this.maxScale,
+      Math.max(this.minScale, scale)
+    );
+    this.onUpdateScale(this.scale);
+  }
 }

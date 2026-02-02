@@ -9,34 +9,36 @@ export class TactaCanvas {
   paths: { [key: string]: Path2D } = {};
   cardRect: Path2D;
   isMarked = false;
-  markedAreas: string = '';
   xOrg: number;
   yOrg: number;
   cardIdx: number;
+  turnIdx: number;
   cardWidth: number;
   cardHeight: number;
   cardBorder: number;
   cards: TactaCanvas[] = [];
   parentLink: string;
+  markedAreas: string = '';
 
   constructor(src: any, public ts: TactaService) {
     this.ctx = src.ctx;
     this.paths = {};
-    this.cardIdx = src.game?.cardIdx ?? -1;
-    this.parentLink = src.game?.parentLink;
+    this.cardIdx = src.cardIdx ?? -1;
+    this.turnIdx = src.turnIdx ?? -1;
+    this.parentLink = src.parentLink;
     const scale = src.scale ?? 1;
     this.cardWidth = src.cardWidth ?? CardConfig.defWidth * scale;
     this.cardHeight = src.cardHeight ?? CardConfig.defHeight * scale;
     this.cardBorder = src.cardBorder ?? CardConfig.defBorder * scale;
     this.xOrg = src.xMid - this.cardWidth / 2;
     this.yOrg = src.yMid - this.cardHeight / 2;
-    for (const card of (src.game?.linkedCards ?? [])) {
+    for (const card of (src.linkedCards ?? [])) {
       this.cards.push(this.ts.createTactaCanvas({
+        ...card,
         ctx: this.ctx,
         cardWidth: this.cardWidth,
         cardHeight: this.cardHeight,
         cardBorder: this.cardBorder,
-        game: card,
         xMid: this.xOrg,
         yMid: this.yOrg
       }));
@@ -54,6 +56,31 @@ export class TactaCanvas {
     }
 
     return this.ts.deck[idx];
+  }
+
+  get asString(): string {
+    const ret: string[] = [];
+    ret.push(`${Utils.hex(this.cardIdx)}${Utils.hex(this.turnIdx)}${this.parentLink ?? '--'}[`);
+    for (const link of this.cards) {
+      ret.push(link.asString);
+    }
+    ret.push(']');
+    return Utils.join(ret, '');
+  }
+
+  static fromString(src: string, cards: TactaCanvas[], ts: TactaService, i = 0): number {
+    while (i < src.length && src[i] !== ']') {
+      const cardIdx = parseInt(src.substring(i, i + 2), 16);
+      const turnIdx = parseInt(src.substring(i + 2, i + 4), 16);
+      const parentLink = src.substring(i + 4, i + 6);
+      const card = new TactaCanvas({cardIdx: cardIdx, turnIdx: turnIdx, parentLink: parentLink}, ts);
+      cards.push(card);
+      i += 8;
+      while (src[i - 1] !== ']') {
+        i = TactaCanvas.fromString(src, card.cards, ts, i - 1);
+      }
+    }
+    return i + 1;
   }
 }
 
@@ -219,10 +246,8 @@ export class TactaCardService {
 
   drawSide4(cvs: TactaCanvas, dir: string, score = '') {
     const bw = cvs.cardBorder;
-    const xm = cvs.cardWidth / 2;
     const ym = cvs.cardHeight / 2;
     let x = bw + bw / 2;
-    let y = bw + bw / 2;
     const cw = cvs.cardHeight - 3 * bw;
     const ch = (cvs.cardHeight - 2 * bw) / 7;
     cvs.ctx.lineJoin = 'round';
@@ -344,7 +369,7 @@ export class TactaCardService {
     }
 
     cvs.ctx.strokeStyle = cvs.isMarked ? cvs.config.colors.sm : 'white';
-    cvs.ctx.fillStyle = cvs.isMarked ? cvs.config.colors.fm : 'black';
+    cvs.ctx.fillStyle = cvs.isMarked ? cvs.config.colors.dm : 'black';
 
     cvs.paths = {};
     const bw = cvs.cardBorder;
@@ -380,18 +405,20 @@ export class TactaCardService {
     cvs.ctx.strokeStyle = 'white';
     cvs.ctx.stroke();
 
-    // the areas
     let score = 0;
+    // the areas
     for (let i = 0; i < cvs.config.areas.length; i += 2) {
       const area = cvs.config.areas.substring(i, i + 2);
       const tmp = parseInt(area.substring(1));
       score += isNaN(tmp) ? 0 : tmp;
-      this.drawArea(cvs, area);
+      if (!cvs.isMarked) {
+        this.drawArea(cvs, area);
+      }
     }
 
     const xm = cvs.cardWidth / 2;
     const ym = cvs.cardHeight / 2;
-    const size = cvs.cardBorder * 3.5;
+    const size = !cvs.isMarked ? cvs.cardBorder * 3.5 : cvs.cardBorder * 10;
     cvs.ctx.fillStyle = cvs.config.colors.f;
     cvs.ctx.strokeStyle = 'white';
     switch (cvs.config.suite) {
