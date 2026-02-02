@@ -336,7 +336,7 @@ export class TactaCardService {
           this.drawScore(cvs, dir, score, xm, ym, size);
           dx = cvs.cardWidth / 4 + bw / 2;
           dy = 0;
-          if (ym === cvs.cardHeight / 2) {
+          if (dir === 'n' || dir === 'p') {
             dy = dx;
             dx = 0;
           }
