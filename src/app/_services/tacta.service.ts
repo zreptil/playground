@@ -1,6 +1,7 @@
 import {Injectable, signal} from '@angular/core';
 import {Utils} from '@/classes/utils';
 import {TactaCanvas} from '@/_services/tacta-card.service';
+import {GLOBALS} from '@/_services/globals.service';
 
 export class Player {
   name: string;
@@ -46,15 +47,16 @@ export class CardConfig {
   providedIn: 'root'
 })
 export class TactaService {
-  colors: any = {
-    0: {s: 'white', f: '#000000', sm: '#ffff00', fm: '#aaaaaa', dm: '#555555'},
-    1: {s: 'white', f: '#e59739', sm: '#ffff00', fm: '#aaaaaa', dm: '#555555'},
-    2: {s: 'white', f: '#da3925', sm: '#ffff00', fm: '#aaaaaa', dm: '#555555'},
-    3: {s: 'white', f: '#df3ec0', sm: '#ffff00', fm: '#aaaaaa', dm: '#555555'},
-    4: {s: 'white', f: '#4535d4', sm: '#ffff00', fm: '#aaaaaa', dm: '#555555'},
-    5: {s: 'white', f: '#77b4f8', sm: '#ffff00', fm: '#aaaaaa', dm: '#555555'},
-    6: {s: 'white', f: '#8adb5a', sm: '#ffff00', fm: '#aaaaaa', dm: '#555555'}
-  };
+  refresh = signal<boolean>(false);
+  colors: any[] = [
+    {id: 0, s: 'white', f: '#000000', sm: '#ffff00', fm: '#aaaaaa', dm: '#555555'},
+    {id: 1, s: 'white', f: '#e59739', sm: '#ffff00', fm: '#aaaaaa', dm: '#555555'},
+    {id: 2, s: 'white', f: '#da3925', sm: '#ffff00', fm: '#aaaaaa', dm: '#555555'},
+    {id: 3, s: 'white', f: '#df3ec0', sm: '#ffff00', fm: '#aaaaaa', dm: '#555555'},
+    {id: 4, s: 'white', f: '#4535d4', sm: '#ffff00', fm: '#aaaaaa', dm: '#555555'},
+    {id: 5, s: 'white', f: '#77b4f8', sm: '#ffff00', fm: '#aaaaaa', dm: '#555555'},
+    {id: 6, s: 'white', f: '#8adb5a', sm: '#ffff00', fm: '#aaaaaa', dm: '#555555'}
+  ];
   deck: CardConfig[];
   board: TactaCanvas[];
   players: Player[];
@@ -129,16 +131,34 @@ export class TactaService {
   // global signal to refresh all instances of TactaCard
   markedCanvas = signal<TactaCanvas>(null);
 
+  get playerList() {
+    const ret: Player[] = [this.players[this.playerIdx]];
+    for (let i = 0; i < this.players.length; i++) {
+      if (i !== this.playerIdx) {
+        ret.push(this.players[i]);
+      }
+    }
+    return ret;
+  }
+
+  // get gamesAsString(): string {
+  //   return this.games?.reduce((a, b) => a + b.asString, '') ?? '';
+  // }
+
+  get scoreType() {
+    let ret = 0;
+    if (GLOBALS.isDebug) {
+      ret = 1;
+    }
+    return ret;
+  }
+
   cardOfPlayer(player: Player, id: number, idx: number) {
     if (player.cvs[id] == null) {
       player.cvs[id] = new TactaCanvas({cardIdx: player?.cards?.[idx], turnIdx: -1, scale: 2}, this);
     }
     return player.cvs[id];
   }
-
-  // get gamesAsString(): string {
-  //   return this.games?.reduce((a, b) => a + b.asString, '') ?? '';
-  // }
 
   card(data: any) {
     const ret = new CardConfig();
@@ -206,15 +226,19 @@ export class TactaService {
     // src = '0000--[7101qq[]7102qr[]]';
     // src = '0000--[7101rq[]7102rr[]]';
     src = '0000--[]';
-    this.board = [];
-    TactaCanvas.fromString(src, this.board, this);
+    //src = '0000--[3d01di[1102on[6604aj[]3705fe[]]]3c03oo[]]';
+    // src = '0000--[2f01rq[]9802ja[3403no[240cdi[280dqq[]]]1904di[b207ee[]1308on[2509ff[200aoo[]]ab0bcl[]]]2605dl[1a06dj[]]]]';
+    const cvs: TactaCanvas[] = [];
+    this.players = [];
+    TactaCanvas.fromString(src, cvs, this);
+    this.board = cvs;
   }
 
   createPlayer(name: string, color = -1, cards: number[] = null) {
     this.players ??= [];
     let start: number;
     const colors = [];
-    if (color < 0 || this.players.some(p => p.cards.includes((color + 1) * 18))) {
+    if (color <= 0 || this.players.some(p => p.cards.includes((color - 1) * 18))) {
       // collect colors not given to any player
       for (let i = 1; i < 7; i++) {
         if (!this.players.some(p => p.cards.includes(i * 18))) {
@@ -224,11 +248,11 @@ export class TactaService {
       // pick one color
       start = colors[Math.floor(Math.random() * colors.length)] * 18 + 1;
     } else {
-      start = color * 18 + 1;
+      start = (color - 1) * 18 + 1;
     }
     const player = new Player();
     player.name = name;
-    player.color = Math.floor(start / 18);
+    player.color = color;
     player.cards = cards ?? Utils.randomNumbers(18, start);
     this.players.push(player);
   }
@@ -270,24 +294,21 @@ export class TactaService {
     src.cardWidth = cvs.cardWidth;
     src.cardHeight = cvs.cardHeight;
     src.cardBorder = cvs.cardBorder;
-    src.turnIdx = this.highestTurn(cvs) + 1;
+    src.turnIdx = (this.highestTurn(cvs)?.turnIdx ?? 0) + 1;
     dst.cards.push(src);
-    for (const player of this.players) {
-      player.cards = player.cards.filter(c => c !== src.cardIdx);
-      player.cvs = [];
-    }
+    this.removeCardFromPlayers(src.cardIdx);
     this.clearMarkedAreas();
     this.playerIdx = (this.playerIdx + 1) % this.players.length;
     this.calcScore(cvs);
   }
 
   cardColor(cardIdx: number) {
-    return Math.floor((cardIdx - 1) / 18);
+    return Math.floor((this.normalizeCardIdx(cardIdx) - 1) / 18) + 1;
   }
 
-  playerForCard(cardIdx: number) {
-    const color = Math.floor((this.normalizeCardIdx(cardIdx) - 1) / 18);
-    return this.players.find(p => p.color === color);
+  playerIdxForCard(cardIdx: number) {
+    const color = this.cardColor(cardIdx);
+    return this.players.findIndex(p => p.color === color);
   }
 
   normalizeCardIdx(cardIdx: number) {
@@ -296,7 +317,6 @@ export class TactaService {
 
   calcScore(cvs: TactaCanvas, init = true) {
     if (init) {
-      console.log('Auf gehts', cvs);
       for (const player of this.players) {
         player.score = 0;
       }
@@ -307,9 +327,12 @@ export class TactaService {
       const score = +(this.deck[cardIdx].areas.substring(i + 1, i + 2));
       if (score > 0) {
         if (!cvs.cards.some(c => c.parentLink.endsWith(id))) {
-          const p = this.playerForCard(cardIdx);
-          if (p != null) {
-            p.score += score;
+          const idx = this.playerIdxForCard(cardIdx);
+          if (idx >= 0) {
+            this.players[idx].score += score;
+            console.log(`Card ${cardIdx}`, score, this.players[idx].score);
+          } else {
+            console.log(`Card ${cardIdx} not found in player list`);
           }
         }
       }
@@ -319,11 +342,33 @@ export class TactaService {
     }
   }
 
-  highestTurn(cvs: TactaCanvas, max = 0) {
-    max = Math.max(max, cvs.turnIdx);
-    for (const card of cvs.cards) {
-      max = Math.max(max, this.highestTurn(card, max));
+  removeCardFromPlayers(cardIdx: number) {
+    for (const player of this.players ?? []) {
+      player.cards = player.cards.filter(c => this.normalizeCardIdx(c) !== this.normalizeCardIdx(cardIdx));
+      player.cvs = [];
     }
-    return max;
+  }
+
+  highestTurn(cvs: TactaCanvas, found?: TactaCanvas) {
+    let max = found?.turnIdx ?? 0;
+    if (cvs.turnIdx >= max) {
+      found = cvs;
+      max = found.turnIdx;
+    }
+    for (const card of cvs.cards) {
+      const temp = this.highestTurn(card, found);
+      if (temp?.turnIdx > max) {
+        found = temp;
+        max = found.turnIdx;
+      }
+    }
+    return found;
+  }
+
+  activateCurrentPlayer() {
+    const cvs = this.highestTurn(this.board[0]);
+    if (cvs != null) {
+      this.playerIdx = (this.playerIdxForCard(cvs.cardIdx) + 1) % this.players.length;
+    }
   }
 }

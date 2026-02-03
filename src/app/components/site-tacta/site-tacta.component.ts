@@ -5,7 +5,7 @@ import {Player, TactaService} from '@/_services/tacta.service';
 import {Utils} from '@/classes/utils';
 import {TactaBoardComponent} from '@/controls/tacta-board/tacta-board.component';
 import {GlobalsService} from '@/_services/globals.service';
-import {MatIconButton} from '@angular/material/button';
+import {MatButton, MatIconButton} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
 
 @Component({
@@ -14,7 +14,8 @@ import {MatIcon} from '@angular/material/icon';
     TactaCardComponent,
     TactaBoardComponent,
     MatIconButton,
-    MatIcon
+    MatIcon,
+    MatButton
   ],
   templateUrl: './site-tacta.component.html',
   styleUrl: './site-tacta.component.scss'
@@ -27,12 +28,18 @@ export class SiteTactaComponent {
               public ts: TactaService,
               public globals: GlobalsService) {
     this.ts.createDeck();
-    this.ts.createPlayer('Zreptil');
-    this.ts.createPlayer('Player 1');
-    // this.ts.createPlayer('Player 2');
-    // this.ts.createPlayer('Player 3');
-    // this.ts.createPlayer('Player 4');
-    // this.ts.createPlayer('Player 5');
+    if (this.ts.players.length === 0) {
+      this.ts.createPlayer('Zreptil');
+      this.ts.createPlayer('Spieler 1');
+    }
+    this.ts.activateCurrentPlayer();
+  }
+
+  get colorList() {
+    return this.ts.colors.filter((c, idx) =>
+      idx > 0
+      && !this.ts.players.some(p => p.color === c.id)
+    );
   }
 
   score(player: Player) {
@@ -41,6 +48,30 @@ export class SiteTactaComponent {
 
   cardCount(player: Player) {
     return Utils.plural(player.cards.length, {1: '1 Karte', other: `${player.cards.length} Karten`});
+  }
+
+  styleForColor(color: any, player: Player) {
+    const size = (player.cvs[0].cardHeight / this.colorList.length) + 'px';
+    return {
+      backgroundColor: color.f,
+      height: size,
+      width: size
+    };
+  }
+
+  clickColor(evt: PointerEvent, player: Player, color: any) {
+    evt.stopPropagation();
+    for (const card of this.ts.board) {
+      card.changeColor(color.id, player.color);
+    }
+    const cards: number[] = [];
+    for (const card of player.cards) {
+      cards.push(card - player.color * 18 + color.id * 18);
+    }
+    player.cards = cards;
+    player.cvs = [];
+    player.color = color.id;
+    this.ts.refresh.set(!this.ts.refresh());
   }
 
   protected clickCycle(evt: PointerEvent, player: Player) {

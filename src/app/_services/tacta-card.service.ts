@@ -26,7 +26,7 @@ export class TactaCanvas {
     this.cardIdx = src.cardIdx ?? -1;
     this.turnIdx = src.turnIdx ?? -1;
     this.parentLink = src.parentLink;
-    const scale = src.scale ?? 1;
+    const scale = src.scale ?? CardConfig.scale;
     this.cardWidth = src.cardWidth ?? CardConfig.defWidth * scale;
     this.cardHeight = src.cardHeight ?? CardConfig.defHeight * scale;
     this.cardBorder = src.cardBorder ?? CardConfig.defBorder * scale;
@@ -74,13 +74,36 @@ export class TactaCanvas {
       const turnIdx = parseInt(src.substring(i + 2, i + 4), 16);
       const parentLink = src.substring(i + 4, i + 6);
       const card = new TactaCanvas({cardIdx: cardIdx, turnIdx: turnIdx, parentLink: parentLink}, ts);
+      // 1 - 18 = 1
+      // 19 - 36 = 2
+      // 37 - 54 = 3
+      // 55 - 72 = 4
+      // 73 - 90 = 5
+      // 91 - 108 = 6
+      if (card.cardIdx > 0 && ts.playerIdxForCard(card.cardIdx) < 0) {
+        ts.createPlayer(`Spieler ${ts.players.length + 1}`, ts.cardColor(card.cardIdx));
+      }
       cards.push(card);
+      ts.removeCardFromPlayers(card.cardIdx);
       i += 8;
       while (src[i - 1] !== ']') {
         i = TactaCanvas.fromString(src, card.cards, ts, i - 1);
       }
     }
     return i + 1;
+  }
+
+  changeColor(dstColor: number, srcColor?: number): void {
+    const currColor = this.ts.cardColor(this.cardIdx);
+    if (srcColor == null) {
+      srcColor = this.ts.cardColor(this.cardIdx);
+      this.cardIdx = this.cardIdx - srcColor * 18 + dstColor * 18;
+    } else if (currColor === srcColor) {
+      this.cardIdx = this.cardIdx - srcColor * 18 + dstColor * 18;
+    }
+    for (const card of this.cards) {
+      card.changeColor(dstColor, srcColor);
+    }
   }
 }
 
@@ -93,7 +116,13 @@ export class TactaCardService {
 
   drawScore(cvs: TactaCanvas, dir: string, score: string, xm: number, ym: number, size: number) {
     if (GLOBALS.isDebug) {
-      this.centerText(cvs, cvs.config.flipped ? dir : (cvs.info ?? `${Utils.hex(cvs.cardIdx)}`), xm, ym);
+      let text = dir;
+      switch (this.ts.scoreType) {
+        case 1:
+          text = cvs.info ?? `${Utils.hex(cvs.cardIdx)}`;
+          break;
+      }
+      this.centerText(cvs, text, xm, ym);
     } else if (score !== '0') {
       cvs.ctx.arc(xm, ym, size, 0, Math.PI * 2);
     }
@@ -356,8 +385,15 @@ export class TactaCardService {
     }
   }
 
-  drawCard(cvs: TactaCanvas): void {
-    cvs.ctx.save(); // Aktuellen Zustand speichern
+  /**
+   * Renders a playing card on the specified canvas,
+   * considering alignment, rotation, and configuration options.
+   *
+   * @param {TactaCanvas} cvs - The canvas and associated properties used for rendering the card.
+   * @param {number} [turnIdx=-1] - The index of the turn to determine whether the card should be rendered or skipped.
+   */
+  drawCard(cvs: TactaCanvas, turnIdx = -1): void {
+    cvs.ctx.save();
     const link = this.ts.connectors[cvs.parentLink];
     if (link != null) {
       cvs.ctx.translate(50 * cvs.cardWidth / 100, 50 * cvs.cardHeight / 100);
@@ -368,91 +404,105 @@ export class TactaCardService {
       cvs.ctx.translate(cvs.xOrg, cvs.yOrg);
     }
 
-    cvs.ctx.strokeStyle = cvs.isMarked ? cvs.config.colors.sm : 'white';
-    cvs.ctx.fillStyle = cvs.isMarked ? cvs.config.colors.dm : 'black';
+    if (turnIdx < 0 || turnIdx === cvs.turnIdx) {
+      cvs.ctx.strokeStyle = cvs.isMarked ? cvs.config.colors.sm : 'white';
+      cvs.ctx.fillStyle = cvs.isMarked ? cvs.config.colors.dm : 'black';
 
-    cvs.paths = {};
-    const bw = cvs.cardBorder;
-    let x = bw / 2;
-    let y = bw / 2;
-    let w = cvs.cardWidth - bw;
-    let h = cvs.cardHeight - bw;
-    cvs.ctx.fillRect(x + bw, y + bw, w - bw * 2, h - bw * 2);
+      cvs.paths = {};
+      const bw = cvs.cardBorder;
+      let x = bw / 2;
+      let y = bw / 2;
+      let w = cvs.cardWidth - bw;
+      let h = cvs.cardHeight - bw;
+      cvs.ctx.fillRect(x + bw, y + bw, w - bw * 2, h - bw * 2);
 
-    const path = new Path2D();
-    path.moveTo(x + bw, y + bw);
-    path.lineTo(x + w - bw, y + bw);
-    path.lineTo(x + w - bw, y + h - bw);
-    path.lineTo(x + bw, y + h - bw);
-    path.closePath();
-    cvs.cardRect = new Path2D();
-    cvs.cardRect.addPath(path, cvs.ctx.getTransform());
+      const path = new Path2D();
+      path.moveTo(x + bw, y + bw);
+      path.lineTo(x + w - bw, y + bw);
+      path.lineTo(x + w - bw, y + h - bw);
+      path.lineTo(x + bw, y + h - bw);
+      path.closePath();
+      cvs.cardRect = new Path2D();
+      cvs.cardRect.addPath(path, cvs.ctx.getTransform());
 
-    // the outer frame
-    cvs.ctx.beginPath();
-    cvs.ctx.roundRect(x, y, w, h, bw * 2);
-    cvs.ctx.strokeStyle = cvs.config.colors.f;
-    cvs.ctx.lineWidth = bw;
-    cvs.ctx.stroke();
+      // the outer frame
+      cvs.ctx.beginPath();
+      cvs.ctx.roundRect(x, y, w, h, bw * 2);
+      cvs.ctx.strokeStyle = cvs.config.colors.f;
+      cvs.ctx.lineWidth = bw;
+      cvs.ctx.stroke();
 
-    // the inner frame
-    cvs.ctx.beginPath();
-    x += bw;
-    y += bw;
-    w -= bw * 2;
-    h -= bw * 2;
-    cvs.ctx.roundRect(x, y, w, h, bw);
-    cvs.ctx.strokeStyle = 'white';
-    cvs.ctx.stroke();
+      // the inner frame
+      cvs.ctx.beginPath();
+      x += bw;
+      y += bw;
+      w -= bw * 2;
+      h -= bw * 2;
+      cvs.ctx.roundRect(x, y, w, h, bw);
+      cvs.ctx.strokeStyle = 'white';
+      cvs.ctx.stroke();
 
-    let score = 0;
-    // the areas
-    for (let i = 0; i < cvs.config.areas.length; i += 2) {
-      const area = cvs.config.areas.substring(i, i + 2);
-      const tmp = parseInt(area.substring(1));
-      score += isNaN(tmp) ? 0 : tmp;
-      if (!cvs.isMarked) {
-        this.drawArea(cvs, area);
+      let score = 0;
+      // the areas
+      for (let i = 0; i < cvs.config.areas.length; i += 2) {
+        const area = cvs.config.areas.substring(i, i + 2);
+        const tmp = parseInt(area.substring(1));
+        score += isNaN(tmp) ? 0 : tmp;
+        if (!cvs.isMarked) {
+          this.drawArea(cvs, area);
+        }
+      }
+
+      const xm = cvs.cardWidth / 2;
+      const ym = cvs.cardHeight / 2;
+      const size = !cvs.isMarked ? cvs.cardBorder * 3.5 : cvs.cardBorder * 10;
+      cvs.ctx.fillStyle = cvs.config.colors.f;
+      cvs.ctx.strokeStyle = 'white';
+      switch (cvs.config.suite) {
+        case 0:
+          cvs.ctx.beginPath();
+          cvs.ctx.arc(xm, ym, size, 0, Math.PI * 2);
+          cvs.ctx.fill();
+          cvs.ctx.arc(xm, ym, size - cvs.cardBorder / 3, 0, Math.PI * 2);
+          cvs.ctx.lineWidth = cvs.cardBorder / 3;
+          cvs.ctx.stroke();
+          break;
+        case 3:
+          this.drawPath(cvs, '', [
+            [xm - size, ym + size * 0.6],
+            [xm + size, ym + size * 0.6],
+            [xm, ym - size],
+          ], '5', cvs.cardBorder / 2);
+          break;
+        case 4:
+          this.drawPath(cvs, '', [
+            [xm - size, ym - size],
+            [xm + size, ym - size],
+            [xm + size, ym + size],
+            [xm - size, ym + size],
+          ], '5', cvs.cardBorder / 2);
+          break;
+      }
+
+      this.centerText(cvs, score > 0 ? `${score}` : 'X', xm, ym);
+      if (turnIdx >= 0) {
+        cvs.ctx.restore();
+        return;
       }
     }
-
-    const xm = cvs.cardWidth / 2;
-    const ym = cvs.cardHeight / 2;
-    const size = !cvs.isMarked ? cvs.cardBorder * 3.5 : cvs.cardBorder * 10;
-    cvs.ctx.fillStyle = cvs.config.colors.f;
-    cvs.ctx.strokeStyle = 'white';
-    switch (cvs.config.suite) {
-      case 0:
-        cvs.ctx.beginPath();
-        cvs.ctx.arc(xm, ym, size, 0, Math.PI * 2);
-        cvs.ctx.fill();
-        cvs.ctx.arc(xm, ym, size - cvs.cardBorder / 3, 0, Math.PI * 2);
-        cvs.ctx.lineWidth = cvs.cardBorder / 3;
-        cvs.ctx.stroke();
-        break;
-      case 3:
-        this.drawPath(cvs, '', [
-          [xm - size, ym + size * 0.6],
-          [xm + size, ym + size * 0.6],
-          [xm, ym - size],
-        ], '5', cvs.cardBorder / 2);
-        break;
-      case 4:
-        this.drawPath(cvs, '', [
-          [xm - size, ym - size],
-          [xm + size, ym - size],
-          [xm + size, ym + size],
-          [xm - size, ym + size],
-        ], '5', cvs.cardBorder / 2);
-        break;
-    }
-
-    this.centerText(cvs, score > 0 ? `${score}` : 'X', xm, ym);
-
     for (const card of cvs.cards) {
-      this.drawCard(card);
+      this.drawCard(card, turnIdx);
     }
     cvs.ctx.restore();
+  }
+
+  /**
+   * Draw the board with all cards in the order of their turns
+   */
+  drawBoard(cvs: TactaCanvas) {
+    for (let turnIdx = 0; turnIdx <= this.ts.highestTurn(cvs)?.turnIdx; turnIdx++) {
+      this.drawCard(cvs, turnIdx);
+    }
   }
 
   centerText(cvs: TactaCanvas, text: string, x: number, y: number) {
@@ -517,6 +567,16 @@ export class TactaCardService {
     }
     if ('qr'.indexOf(dir) >= 0) {
       this.drawSide4(cvs, dir, score);
+    }
+  }
+
+  updateContext(cvs: TactaCanvas, ctx: CanvasRenderingContext2D) {
+    cvs.ctx = ctx;
+    cvs.cardWidth = CardConfig.defWidth * CardConfig.scale;
+    cvs.cardHeight = CardConfig.defHeight * CardConfig.scale;
+    cvs.cardBorder = CardConfig.defBorder * CardConfig.scale;
+    for (const card of cvs.cards) {
+      this.updateContext(card, ctx);
     }
   }
 }

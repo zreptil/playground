@@ -1,9 +1,9 @@
 <div cards>
-  @for (player of ts.players; track $index) {
+  @for (player of ts.playerList; track $index) {
     <div player>
       <div name>
         {{ player.name }}
-        @if (globals.isDebug) {
+        @if (globals.isDebug && $index === 0) {
           <button (click)="clickCycle($event, player)" mat-icon-button>
             <mat-icon>360</mat-icon>
           </button>
@@ -16,11 +16,20 @@
             <app-tacta-card [canvas]="ts.cardOfPlayer(player, 1, player.cards.length - 1)"></app-tacta-card>
           }
         }
+        @if (globals.isDebug && $index === 0) {
+          <div colors>
+            @for (color of colorList; track $index) {
+              <button (click)="clickColor($event, player, color)" [style]="styleForColor(color, player)" mat-button>
+                <mat-icon>keyboard_double_arrow_left</mat-icon>
+              </button>
+            }
+          </div>
+        }
       </div>
       <div score>
         {{ score(player) }} / {{ cardCount(player) }}
       </div>
-      @if ($index !== ts.playerIdx) {
+      @if (player.color !== ts.players[ts.playerIdx].color) {
         <div disable></div>
       }
     </div>
@@ -35,3 +44,6 @@
     }
   }
 </div>
+@if (globals.isDebug) {
+  <div info>{{ ts.board[0].asString }}</div>
+}

@@ -32,9 +32,10 @@ export class TactaBoardComponent implements AfterViewInit {
       // GLOBALS.isDebug needs to be accessed to activate effect on changes
       GLOBALS.isDebug;
       this.refresh();
+      this.ts.refresh();
       if (this.cvs != null && this.ctx != null) {
-        this.cvs.ctx = this.ctx;
-        this.tcs.drawCard(this.cvs);
+        this.tcs.updateContext(this.cvs, this.ctx);
+        this.tcs.drawBoard(this.cvs);
       }
     });
   }
@@ -52,15 +53,15 @@ export class TactaBoardComponent implements AfterViewInit {
     this.xMid = canvas.width / 2;
     this.yMid = canvas.height / 2;
     // this.cvs = this.ts.createTactaCanvas({...this, scale: 2});
-    this.cvs.ctx = this.ctx;
     CardConfig.scale = 2;
     this.cvs.cardWidth = CardConfig.defWidth * CardConfig.scale;
     this.cvs.cardHeight = CardConfig.defHeight * CardConfig.scale;
     this.cvs.cardBorder = CardConfig.defBorder * CardConfig.scale;
     this.cvs.xOrg = canvas.width / 2 - this.cvs.cardWidth / 2;
     this.cvs.yOrg = canvas.height / 2 - this.cvs.cardHeight / 2;
+    this.tcs.updateContext(this.cvs, this.ctx);
     this.clearBoard();
-    this.tcs.drawCard(this.cvs);
+    this.tcs.drawBoard(this.cvs);
     Utils.ZoomConfig(
       canvas,
       CardConfig.scale, 0.5, 5,
@@ -72,38 +73,29 @@ export class TactaBoardComponent implements AfterViewInit {
           cardBorder: CardConfig.defBorder * scale
         });
         this.clearBoard();
-        this.tcs.drawCard(this.cvs);
+        this.tcs.drawBoard(this.cvs);
       }, (_x, _y) => {
         this.xCvs = this.cvs.xOrg;
         this.yCvs = this.cvs.yOrg;
       }, (dx, dy) => {
         const canvas = this.canvasRef.nativeElement;
-        this.cvs.xOrg = Math.min(Math.max(0, this.xCvs + dx), canvas.width - this.cvs.cardWidth);
-        this.cvs.yOrg = Math.min(Math.max(0, this.yCvs + dy), canvas.height - this.cvs.cardHeight);
+        const cardCount = 2;
+        this.cvs.xOrg = Math.min(
+          Math.max(this.cvs.cardWidth * -cardCount, this.xCvs + dx),
+          canvas.width + cardCount * this.cvs.cardWidth);
+        this.cvs.yOrg = Math.min(
+          Math.max(this.cvs.cardHeight * -cardCount, this.yCvs + dy),
+          canvas.height + cardCount * this.cvs.cardHeight);
+//         this.cvs.xOrg = // Math.max(Math.min(-this.ts.boundingRect.x, this.xCvs + dx),
+//           canvas.width - this.ts.boundingRect.right - this.cvs.cardWidth;
+// //          this.ts.boundingRect.width - canvas.width - this.cvs.cardWidth;
+//         //);
+//         this.cvs.yOrg = canvas.height / 2;// - this.ts.boundingRect.bottom - this.cvs.cardHeight;
         this.clearBoard();
-        this.tcs.drawCard(this.cvs);
+        this.tcs.drawBoard(this.cvs);
       }
     );
-
-    // const size = 20;
-    // const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}">
-    //   <defs>
-    //     <pattern id="hatch" patternUnits="userSpaceOnUse" width="${size}" height="${size}">
-    //       <rect width="${size}" height="${size}" fill="black"/>
-    //       <path d="M ${0} ${size / 2} L ${size} ${size / 2}"
-    //       stroke="red" stroke-width="${size / 10}"/>
-    //     </pattern>
-    //   </defs>
-    //   <rect width="${size}" height="${size}" fill="url(#hatch)"/></svg>`;
-    // const img = new Image();
-    // img.src = 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
-    // img.onload = () => {
-    //   const pat = this.ctx.createPattern(img, 'repeat')!;
-    //   pat.setTransform(new DOMMatrix().rotate(30));
-    //   for (let key of Object.keys(this.ts.colors)) {
-    //     this.ts.colors[key].dm = this.ts.colors[key].f;
-    //   }
-    // };
+    this.ts.calcScore(this.cvs);
   }
 
   findArea(cvs: TactaCanvas, x: number, y: number, fullCard = false): TactaCanvas {
@@ -111,8 +103,8 @@ export class TactaBoardComponent implements AfterViewInit {
 
     if (fullCard) {
       if (cvs.cardIdx !== 0
-        && this.ts.players[this.ts.playerIdx].color === this.ts.cardColor(cvs.cardIdx)
-        && this.ctx.isPointInPath(cvs.cardRect, x, y) && cvs.cards.length === 0) {
+        && this.ctx.isPointInPath(cvs.cardRect, x, y)
+        && this.ts.highestTurn(this.cvs)?.cardIdx === cvs.cardIdx) {
         return cvs;
       }
     } else {
@@ -163,24 +155,8 @@ export class TactaBoardComponent implements AfterViewInit {
     this.cvs.ctx.fill();
   }
 
-  // @HostListener('wheel', ['$event'])
-  // onWheel(evt: WheelEvent) {
-  //   CardConfig.scale = Math.max(0.5, Math.min(5, CardConfig.scale + Math.sign(evt.deltaY) * 0.1));
-  //   this.scaleCvs(this.cvs);
-  //   this.clearBoard();
-  //   this.tcs.drawCard(this.cvs);
-  // }
-
   @HostListener('mousemove', ['$event'])
   onMouseMove(evt: MouseEvent) {
-    // if (this.xDown != null && this.yDown != null) {
-    //   const canvas = this.canvasRef.nativeElement;
-    //   this.cvs.xOrg = Math.min(Math.max(0, this.xCvs + evt.clientX - this.xDown), canvas.width - this.cvs.cardWidth);
-    //   this.cvs.yOrg = Math.min(Math.max(0, this.yCvs + evt.clientY - this.yDown), canvas.height - this.cvs.cardHeight);
-    //   this.clearBoard();
-    //   this.tcs.drawCard(this.cvs);
-    //   return;
-    // }
     const rect = this.canvasRef.nativeElement.getBoundingClientRect();
     this.clearMarkedAreas(this.cvs);
     this.currentArea = this.findArea(this.cvs, evt.clientX - rect.x, evt.clientY - rect.y);
@@ -190,12 +166,12 @@ export class TactaBoardComponent implements AfterViewInit {
         this.clearMarkedAreas(this.cvs);
         this.currentArea.isMarked = true;
         this.currentCursor = 'no-drop';
-        this.tcs.drawCard(this.cvs);
+        this.tcs.drawBoard(this.cvs);
         return;
       }
     }
     this.currentCursor = this.currentArea != null ? 'pointer' : 'default';
-    this.tcs.drawCard(this.cvs);
+    this.tcs.drawBoard(this.cvs);
   }
 
   @HostListener('mousedown', ['$event'])
@@ -208,7 +184,7 @@ export class TactaBoardComponent implements AfterViewInit {
     //   return;
     // }
     if (this.currentArea?.isMarked) {
-      const playerIdx = this.ts.players.findIndex(p => p.color === Math.floor((this.ts.normalizeCardIdx(this.currentArea.cardIdx) - 1) / 18));
+      const playerIdx = this.ts.players.findIndex(p => p.color === this.ts.cardColor(this.currentArea.cardIdx));
       if (playerIdx >= 0) {
         this.ts.players[playerIdx].cards.push(this.currentArea.cardIdx);
         this.removeCard(this.cvs, this.currentArea.cardIdx);
@@ -216,7 +192,8 @@ export class TactaBoardComponent implements AfterViewInit {
       }
       this.currentArea = null;
       this.clearBoard();
-      this.tcs.drawCard(this.cvs);
+      this.ts.calcScore(this.cvs);
+      this.ts.refresh.set(!this.ts.refresh());
       return;
     }
     this.ts.moveMarkedToBoard(this.cvs, this.currentArea);

@@ -32,6 +32,7 @@
         width: calc(100% + 100px);
         height: 100%;
         background: rgba(0, 0, 0, 0.1);
+        z-index: 100;
       }
 
       [name] {
@@ -49,6 +50,17 @@
         align-items: center;
         justify-content: center;
         gap: 1em;
+
+        [colors] {
+          display: flex;
+          flex-flow: column;
+          align-items: center;
+          justify-content: center;
+
+          [mat-button] {
+            padding: 0;
+          }
+        }
       }
 
       [score] {
@@ -64,5 +76,19 @@
     display: flex;
     flex-flow: row wrap;
     overflow-y: auto;
+  }
+
+  [info] {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    padding: 0.5em;
+    color: white;
+    background-color: rgba(0, 0, 0, 0.4);
   }
 }

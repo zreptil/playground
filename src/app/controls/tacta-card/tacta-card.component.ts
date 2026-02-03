@@ -32,7 +32,7 @@ export class TactaCardComponent implements AfterViewInit {
     effect(() => {
       // GLOBALS.isDebug needs to be accessed to activate effect on changes
       // noinspection JSUnusedLocalSymbols
-      const test: any = this.ts.markedCanvas() || GLOBALS.isDebug || this.refresh();
+      const test: any = this.ts.markedCanvas() || GLOBALS.isDebug || this.refresh() || this.ts.refresh();
       if (this.initialized && this.lastCardIdx !== this.cvs.cardIdx) {
         this.updateCanvas();
       } else if (this.cvs != null && this.ctx != null) {
@@ -78,7 +78,7 @@ export class TactaCardComponent implements AfterViewInit {
   }
 
   onCanvasClick(evt: PointerEvent) {
-    const area = this.areaForPos(evt);
+    let area = this.areaForPos(evt);
     if (area == null) {
       const oldIdx = this.cvs.cardIdx;
       if (this.cvs.cardIdx >= 128) {
@@ -95,6 +95,9 @@ export class TactaCardComponent implements AfterViewInit {
       }
       this.ts.clearMarkedAreas();
     } else {
+      if (this.cvs.markedAreas === area) {
+        area = null;
+      }
       this.ts.clearMarkedAreas();
       this.cvs.markedAreas = area;
       this.ts.markedCanvas.set(this.cvs);
